@@ -1,0 +1,40 @@
+2001/07/25
+----------
+PhotoCorners v1.0 Design
+  by Ashley M. Kirchner <mailto:ashley@pcraft.com>
+
+HTML 4.0, CSS 2.0 & XHTML 1.0 validated by http://www.w3c.org
+
+
+Thank You goes to John Moose for creating such an awesome program,
+and for having the patience to put up with me and my bazillion
+emails containing bugs, questions, suggestions, praise and others.
+
+Oh, and also for his patience to wait for this theme.  :)
+
+						- Ash
+
+
+
+------------------
+ ChangeLog v1.0.3
+------------------
+2001/07/26 - Fixed style tags on postcomment and viewcomments templates
+           - Cosmetic addition to the siteHeader and label pair on each
+             template (except home).
+             
+
+------------------
+ ChangeLog v1.0.2
+------------------
+2001/07/25 - Fixed background tags on <td> elements for horizontal
+             and vertical lines.
+           - Deleted unnecessary definitions from styles.css
+
+------------------
+ ChangeLog v1.0.1
+------------------
+2001/07/25 - Removed all absolute path reference (D'oph!)
+           - Fixed styles.css
+           - Added missing font style tags on home discription
+             and siteFooter tags.

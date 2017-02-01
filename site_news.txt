@@ -1,0 +1,1 @@
+20030331153524:::Welcome to IDS 0.82!:::Changes:<ul><li>CVS enabled</li><li>Slovak localization upated.</li><li>Long standing search error fixed.</li></ul>

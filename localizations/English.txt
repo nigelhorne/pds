@@ -1,0 +1,106 @@
+# US English 3/31/01 John Moose
+#
+#   format-
+#       valuename:"value"
+
+
+
+# Site-wide
+site-language:"en-US"
+site-encoding:"iso-8859-1"
+site-footer:"This page generated at %time on %date by %version."
+site-searchButton:"Search"
+
+# Home page
+home-albumLabel:"albums"
+home-newsLabel:"news"
+home-commentLink:"View recent comments..."
+
+# Album page
+album-sortName:"Sort by name"
+album-sortDate:"Sort by date"
+album-sortSize:"Sort by size"
+album-sortIntelligent:"Intelligent name sort"
+album-sortButton:"Sort"
+album-itemCount:"items %firstItem-%lastItem of %totalItems"
+album-noItems:"no items found"
+album-oneItem:"1 item"
+album-pageNumber:"page&nbsp;%pageNumber"
+album-hasComments:"has comments"
+album-mainPageLink:"main page"
+album-previousAlbumLink:"previous album"
+
+# Image page
+image-backToAlbum:"back to album"
+image-previousImage:"previous image"
+image-nextImage:"next image"
+image-imageSizeTiny:"tiny"
+image-imageSizeSmall:"small"
+image-imageSizeMedium:"medium"
+image-imageSizeLarge:"large"
+image-imageSizeXLarge:"x-large"
+image-imageSizeOriginal:"original"
+image-imageSizeButton:"Resize"
+image-infoType:"Image type"
+image-infoFileSize:"File size"
+image-infoImageSize:"Image Size"
+image-infoUploaded:"Uploaded"
+image-infoUploaded1:"%days days ago"
+image-infoUploaded2:"today"
+image-infoCameraMake:"Make"
+image-infoCameraModel:"Model"
+image-infoFlash:"Flash"
+image-infoDate:"Taken"
+image-infoISO:"ISO"
+image-infoFocalLength:"Focal length"
+image-infoShutter:"Shutter"
+image-infoAperture:"Aperture"
+image-infoEmbedded:"Embedded comment"
+image-infoUnknown:"unknown"
+image-comments:"Comments"
+image-noComments:"This image has no comments."
+image-commentButton:"Post Comment"
+image-orderPhotoButton:"Order This Photo"
+image-shutterfly:"This gallery includes support for Shutterfly. Click the "Order This Photo" button to quickly and easily order high-quality photographic prints of your favorite pictures through Shutterfly.com."
+
+# Comment Viewer
+commentviewer-label:"recent comments"
+commentviewer-counter:"%comments of %totalComments comments shown"
+commentviewer-from:"From"
+commentviewer-time:"Time"
+commentviewer-comment:"Comment"
+commentviewer-mainPageLink:"main page"
+commentviewer-noComments:"Sorry, no comments found."
+
+# Comment Poster
+commentposter-label:"post comment"
+commentposter-post:"Please enter a comment for this image. HTML tags will be removed."
+commentposter-name:"Your name (optional)"
+commentposter-IPaddress:"Your IP address"
+commentposter-comment:"Your Comment"
+commentposter-previewCommentButton:"Preview Comment"
+commentposter-verify:"Please verify your comment."
+commentposter-anon:"anonymous"
+commentposter-editCommentButton:"Edit Comment"
+commentposter-postCommentButton:"Post Comment"
+commentposter-success:"Comment posted. Thanks!"
+commentposter-linkToImage:"return to image %imageName"
+commentposter-errorDisabled:"Sorry, this site's administrator has disabled guest comments."
+commentposter-errorBanned:"Sorry, you have been banned from posting comments."
+commentposter-errorBanned1:"Your comment was not posted. This site's administrator has prohibited words used in your comment."
+
+# Search Results
+search-label:"search results"
+search-text:"search text"
+search-counter:"%foundItems items found"
+search-counter1:"1 item found"
+search-location:"Location"
+search-comments:"Comments"
+search-lastMod:"Last modified"
+search-noHits:"Sorry, no matches found. Please try again."
+search-mainPageLink:"main page"
+
+# Error
+error-label:"IDS Error"
+error-text1:"An error has occurred!"
+error-text2:"If this error persists, please contact this site's administrator."

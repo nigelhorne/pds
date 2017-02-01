@@ -1,0 +1,106 @@
+# Romana 6/19/02 Kovacs Andrei
+#
+#   format-
+#       numevaloare:"valoare"
+
+
+
+# Site-wide
+site-language:"ro-RO"
+site-encoding:"iso-8859-1"
+site-footer:"Aceasta pagina a fost generata la ora %time in data de %date, de %version."
+site-searchButton:"Cauta"
+
+# Home page
+home-albumLabel:"albume"
+home-newsLabel:"noutati"
+home-commentLink:"Afiseaza comentariile recente..."
+
+# Album page
+album-sortName:"Sortare dupa nume"
+album-sortDate:"Sortare dupa data"
+album-sortSize:"Sortare dupa marime"
+album-sortIntelligent:"Sortare inteligenta"
+album-sortButton:"Soreaza"
+album-itemCount:"inregistrarile %firstItem-%lastItem din %totalItems"
+album-noItems:"nu s-a gasit nici o inregistrare"
+album-oneItem:"O inregistrare"
+album-pageNumber:"pagina&nbsp;%pageNumber"
+album-hasComments:"are comentarii"
+album-mainPageLink:"pagina principala"
+album-previousAlbumLink:"albumul precedent"
+
+# Image page
+image-backToAlbum:"inapoi la album"
+image-previousImage:"imaginea anterioara"
+image-nextImage:"imaginea urmatoare"
+image-imageSizeTiny:"foarte mica"
+image-imageSizeSmall:"mica"
+image-imageSizeMedium:"medie"
+image-imageSizeLarge:"mare"
+image-imageSizeXLarge:"foarte mare"
+image-imageSizeOriginal:"originala"
+image-imageSizeButton:"Redimensioneaza"
+image-infoType:"Tipul imaginii"
+image-infoFileSize:"Marimea fisierului"
+image-infoImageSize:"Marimea imaginii"
+image-infoUploaded:"Incarcata"
+image-infoUploaded1:"acum %days zile"
+image-infoUploaded2:"azi"
+image-infoCameraMake:"Producator"
+image-infoCameraModel:"Model"
+image-infoFlash:"Blitz"
+image-infoDate:"Data"
+image-infoISO:"ISO"
+image-infoFocalLength:"Distanta focala"
+image-infoShutter:"Shutter"
+image-infoAperture:"Apertura"
+image-infoEmbedded:"Comentariu"
+image-infoUnknown:"necunoscut"
+image-comments:"Comentarii"
+image-noComments:"Aceasta imagine nu are comentarii."
+image-commentButton:"Adauga comentariu"
+image-orderPhotoButton:"Comanda aceasta fotografie"
+image-shutterfly:"Acest album soporta Shutterfly. Apasa pe "Comanda aceasta fotografie" pentru a comanda o tiparire de inalta calitate a acestei fotografii prin Shutterfly.com."
+
+# Comment Viewer
+commentviewer-label:"comentarii recente"
+commentviewer-counter:"%comments din %totalComments comentarii afisate"
+commentviewer-from:"De la"
+commentviewer-time:"Ora"
+commentviewer-comment:"Comentariu"
+commentviewer-mainPageLink:"pagina principala"
+commentviewer-noComments:"Nu s-a gasit nici un comentariu."
+
+# Comment Poster
+commentposter-label:"adauga un comentariu"
+commentposter-post:"Introduceti un comentariu pentru aceasta imagine. Tag-urile HTML vor fi inlaturate."
+commentposter-name:"Numele dvs. (optional)"
+commentposter-IPaddress:"Adresa IP"
+commentposter-comment:"Comentariul dvs."
+commentposter-previewCommentButton:"Previzualizeaza"
+commentposter-verify:"Va rog verificati comentariul."
+commentposter-anon:"anonim"
+commentposter-editCommentButton:"Editeaza comentariu"
+commentposter-postCommentButton:"Adauga comentariu"
+commentposter-success:"Comentariu adaugat. Multumesc!"
+commentposter-linkToImage:"inapoi la imaginea %imageName"
+commentposter-errorDisabled:"Imi pare rau dar comentariile vizitatorilor sunt dezactivate."
+commentposter-errorBanned:"Imi pare rau dar nu aveti voie sa introduceti comentarii."
+commentposter-errorBanned1:"Comentariul nu a fost adaugat. Administratorul a interzis unele cuvinte din comentariul dvs."
+
+# Search Results
+search-label:"rezultatele cautarii"
+search-text:"text cautat"
+search-counter:"S-au gasit %foundItems inregistrari"
+search-counter1:"S-a gasit o inregistrare"
+search-location:"Locatie"
+search-comments:"Comentarii"
+search-lastMod:"Modificat"
+search-noHits:"Nu s-a gasit nici o inregistrare. Va rog reincercati."
+search-mainPageLink:"pagina principala"
+
+# Error
+error-label:"Eroare IDS"
+error-text1:"A aparut o eroare!"
+error-text2:"Daca nu se rezolva de la sine, va rugam contactati administratorul acestui site."

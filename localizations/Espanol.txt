@@ -1,0 +1,106 @@
+# Spanish - Español 4/23/01 César Blanco
+#
+#   formato-
+#       variable:"valor"
+
+
+
+# Site-wide
+site-language:"es-ES"
+site-encoding:"iso-8859-1"
+site-footer:"Página generada por %version el %date a las %time."
+site-searchButton:"Buscar"
+
+# Home page
+home-albumLabel:"albums"
+home-newsLabel:"noticias"
+home-commentLink:"Leer comentarios recientes..."
+
+# Album page
+album-sortName:"Ordenar por nombre"
+album-sortDate:"Ordenar por fecha"
+album-sortSize:"Ordenar por tamaño"
+album-sortIntelligent:"Ordenación inteligente"
+album-sortButton:"Ordenar"
+album-itemCount:"imagen %firstItem-%lastItem de %totalItems"
+album-noItems:"no hay imágenes"
+album-oneItem:"1 imagen"
+album-pageNumber:"página&nbsp;%pageNumber"
+album-hasComments:"hay comentarios"
+album-mainPageLink:"página principal"
+album-previousAlbumLink:"album anterior"
+
+# Image page
+image-backToAlbum:"volver al album"
+image-previousImage:"imagen anterior"
+image-nextImage:"imagen siguiente"
+image-imageSizeTiny:"muy pequeño"
+image-imageSizeSmall:"pequeño"
+image-imageSizeMedium:"mediano"
+image-imageSizeLarge:"grande"
+image-imageSizeXLarge:"muy grande"
+image-imageSizeOriginal:"original"
+image-imageSizeButton:"Redimensionar"
+image-infoType:"Tipo de imagen"
+image-infoFileSize:"Tamaño del fichero"
+image-infoImageSize:"Tamaño de la imagen"
+image-infoUploaded:"Cargada"
+image-infoUploaded1:"hace %days"
+image-infoUploaded2:"hoy"
+image-infoCameraMake:"Realizada"
+image-infoCameraModel:"Modelo"
+image-infoFlash:"Flash"
+image-infoDate:"Tomada"
+image-infoISO:"Sensibilidad de la película (ISO)"
+image-infoFocalLength:"Distancia focal"
+image-infoShutter:"Velocidad de obturación"
+image-infoAperture:"Diafragma"
+image-infoEmbedded:"Comentario"
+image-infoUnknown:"Desconocido"
+image-comments:"Comentarios"
+image-noComments:"Esta imagen no tiene ningún comentario."
+image-commentButton:"Enviar comentario"
+image-orderPhotoButton:"Solicitar esta fotografía"
+image-shutterfly:"Esta galería fotográfica incluye soporte del sistema "Shutterfly". Haz click en el botón "Solicitar esta fotografía" para solicitar una copia impresa de tus fotos favoritas a Shutterfly.com."
+
+# Comment Viewer
+commentviewer-label:"Comentarios recientes"
+commentviewer-counter:"Mostrados %comments comentarios de un total de  %totalComments"
+commentviewer-from:"De"
+commentviewer-time:"Hora"
+commentviewer-comment:"Comentario"
+commentviewer-mainPageLink:"página principal"
+commentviewer-noComments:"Lo siento, no se han encontrado comentarios."
+
+# Comment Poster
+commentposter-label:"Envía un comentario"
+commentposter-post:"Por favor escribe un comentrio para esta imagen. Código HTML será eliminado."
+commentposter-name:"Tu nombre (opcional)"
+commentposter-IPaddress:"Dirección IP"
+commentposter-comment:"Tu comentario"
+commentposter-previewCommentButton:"Previsualizar comentario"
+commentposter-verify:"Por favor revisa tu comentario."
+commentposter-anon:"anónimo"
+commentposter-editCommentButton:"Editar comentario"
+commentposter-postCommentButton:"Enviar comentario"
+commentposter-success:"Comentario enviado. Gracias"
+commentposter-linkToImage:"Volver a la imagen %imageName"
+commentposter-errorDisabled:"Lo siento, el administrador ha deshabilitado el envío de comentarios de usuarios no registrados."
+commentposter-errorBanned:"Lo siento, se te ha prohibido enviar comentarios."
+commentposter-errorBanned1:"Tu comentario no se ha enviado. El administrador ha prohibido algunas palabras empleadas en tu comentario."
+
+# Search Results
+search-label:"resultados de la búsqueda"
+search-text:"texto de búsqueda"
+search-counter:"Encontradas %foundItems coincidencias"
+search-counter1:"1 coincidencia encontrada"
+search-location:"Situación"
+search-comments:"Comentarios"
+search-lastMod:"Ultima modificación"
+search-noHits:"Lo siento, no se han encontrado coincidencias. Inténtalo de nuevo."
+search-mainPageLink:"página principal"
+
+# Error
+error-label:"Error IDS"
+error-text1:"¡Ha ocurrido un error!"
+error-text2:"Si este error se repite, contacta por favor con el administrador de estas páginas."
