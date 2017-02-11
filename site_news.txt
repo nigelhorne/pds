@@ -1,1 +1,2 @@
+20170211125000:::This is a fork of IDS:::See <a href="https://github.com/nigelhorne/ids">the github repo</a>
 20030331153524:::Welcome to IDS 0.82!:::Changes:<ul><li>CVS enabled</li><li>Slovak localization upated.</li><li>Long standing search error fixed.</li></ul>
