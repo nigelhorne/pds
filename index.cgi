@@ -88,7 +88,7 @@ readLocalization("localizations/".$localization.".txt");
 $languageMenu = '<form method="post" action="'.$idscgi.'">
 		 <select name="localization" size="1" onchange="this.form.submit()">';
 foreach my $availableLang (@availableLocalizations) {
-	$languageMenu .= '<option value="'.$availableLang.'"'.($availableLang eq $localization ? ' selected="selected"' : '').'>'.($languageMappings{$availableLang} ne '' ? $languageMappings{$availableLang} : $availableLang)."</option>\n";
+	$languageMenu .= '<option value="'.$availableLang.'"'.($availableLang eq $localization ? ' selected="selected"' : '').'>'.($languageMappings{$availableLang} ? $languageMappings{$availableLang} : $availableLang)."</option>\n";
 }
 $languageMenu .= '</select>';
 $languageMenu .= '<noscript>&nbsp;<input type="submit" value="&nbsp;&nbsp;Select&nbsp;&nbsp;"></noscript>';
