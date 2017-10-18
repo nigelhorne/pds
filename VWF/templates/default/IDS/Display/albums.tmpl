@@ -1,0 +1,16 @@
+<html>
+	<head>
+		[% IF album %]
+			<title>[% album.title %]</title>
+		[% ELSE %]
+			<title>To be Done</title>
+		[% END %]
+	</head>
+	<body>
+		[% IF album %]
+			<h1>[% album.title %]</h1>
+		[% ELSE %]
+			<h1>To be Done - show a list of the albums</h1>
+		[% END %]
+	</body>
+</html>
