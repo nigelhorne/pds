@@ -41,8 +41,12 @@
 # 
 #########################################################################
 
+
+# Some changes by Nigel Horne <njh@bandsman.co.uk>
+
 # Load modules
 use strict;
+use warnings;
 require CGI;
 use File::Basename;
 use Time::Local;
@@ -52,6 +56,7 @@ use Image::Magick;
 use Image::Info qw(image_info);
 use lib qw(./);
 use idsShared;
+use CGI::Buffer { optimise_content => 1 };
 
 readPreferences('./ids.conf');
 
