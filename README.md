@@ -11,7 +11,8 @@ Create a [VWF](//github.com/nigelhorne/vwf) website to display your images.
 
 * Thumbnails and Image::Info
 
-* Better presentation of the actual pages with photographs
+* Better presentation of the actual pages with photographs.
+Look into http://dimsemenov.com/plugins/magnific-popup/ (single image pop-up)
 
 * Finish print.css
 
