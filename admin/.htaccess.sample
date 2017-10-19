@@ -1,5 +1,0 @@
-AuthUserFile /var/www/ids/.htpasswd
-AuthGroupFile /dev/null
-AuthName "IDS Administration"
-AuthType Basic
-require user admin
