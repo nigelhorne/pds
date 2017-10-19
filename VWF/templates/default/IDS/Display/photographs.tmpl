@@ -10,9 +10,8 @@
 	</head>
 	<body>
 		[% IF section %]
-			<h1>[% section.title %]</h1>
 			[% IF photographs %]
-				<h1>Choose a Photograph within [% photograph.title %]</h1>
+				<h1>Choose a Photograph within [% section.title %]</h1>
 				<ul>
 					[% FOREACH photograph IN photographs %]
 						<li><a href="/img/[% photograph.file %]">[% photograph.title %]</a></li>
