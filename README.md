@@ -5,6 +5,16 @@ pds
 
 Create a [VWF](//github.com/nigelhorne/vwf) website to display your images.
 
+# TODO
+
+* CSSify all pages.
+
+* Thumbnails and Image::Info
+
+* Better presentation of the actual pages with photographs
+
+* Finish print.css
+
 # LICENSE AND COPYRIGHT
 
 Copyright 2017 Nigel Horne.

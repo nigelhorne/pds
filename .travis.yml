@@ -1,0 +1,21 @@
+language: perl
+
+os:
+  - linux
+  # - osx
+
+# services:
+  # - docker
+
+perl:
+  # - "5.26-extras"
+  - "5.24-extras"
+  - "5.22-extras"
+  - "5.20-extras"
+  - "5.18-extras"
+
+install:
+  - cpanm --skip-satisfied -q -n autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash CHI HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp
+
+script:
+  - cd cgi-bin && perl -c -MO=Lint ./page.fcgi '' && perl -c -Mwarnings::unused ./page.fcgi ''
