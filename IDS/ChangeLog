@@ -1,0 +1,10 @@
+Changes to IDS-0.82 (June 28th, 2002):
+
+	- Fixed a Search bug when traversing symbolic links
+		(Bruno Tavares <bat@ip.pt>)
+	- Fixed Information Disclosure Vulnerability
+		(isox <isox@chainsawbeer.com>)
+	- Fixed Special Characters Encoding
+		(Paul Delano <pauld@zentechnic.com>)
+	- Added Romanian Translation
+		(Kovacs Andrei <k_andrei@yahoo.com>)

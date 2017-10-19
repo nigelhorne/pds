@@ -1,0 +1,52 @@
+_______________________________________________________________________________
+IDS 0.82
+
+http://ids.sourceforge.net/
+_______________________________________________________________________________
+
+Installation instructions are available at the IDS website:
+http://ids.sourceforge.net/
+
+IDS is a perl script that generates a multi-album image gallery on the fly. All
+you need to provide are the images and (optionally) text descriptions. It uses
+HTML template sets called "themes" so you can customize the look of your site.
+
+IDS supports subdirectories, so you can create albums inside of albums. Albums 
+can be symbolic links to directories outside of the IDS directory. Albums 
+will be displayed with an icon featuring an image from the album.
+
+IDS creates thumbnails for JPEG, PNG, TIFF, and GIF images. It can be configured
+to display generic icons for other types of files.
+
+It has a web-based administrative interface so that you may:
+    - edit IDS' preferences
+    - upload, delete, rename, rotate, or caption images 
+    - create, rename, and caption albums 
+    - create, modify, or delete news items
+    - view the size of and delete the image-cache
+    - view IDS' logs
+    - choose the image that appears in an album's icon
+
+Images can be placed directly into directories within the "albums" directory if 
+you do not wish to use the administrative interface.
+
+IDS requires: 
+    - a webserver 
+    - Perl
+    - ImageMagick w/ PerlMagick
+    - the Image::Info Perl module
+      (NOTE: v1.12 has been known to cause problems - use included v1.11 under delegates)
+
+IDS has been tested under Redhat Linux 7.x, 6.2, FreeBSD 4.2, OpenBSD 2.8, and Mac 
+OS X with Apache, and Windows 2000 with IIS, but may work under other OS's or 
+webservers after some modifications.
+
+___________________________
+If you use the Shutterfly logo in a modified version of this script or your 
+own script, you must follow these Shutterfly guidelines:
+    - use it as-is
+    - use it on a white background
+    - only use it on pages where the visitor can order prints
+
+
+

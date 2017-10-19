@@ -1,0 +1,106 @@
+# Nederlands 3/04/01 Bas Debie
+#
+#   format-
+#       valuename:"value"
+
+
+
+# Site-wide
+site-language:"nl-NL"
+site-encoding:"iso-8859-1"
+site-footer:"Deze pagina is gegenereerd op %date om %time door %version."
+site-searchButton:"Zoeken"
+
+# Home page
+home-albumLabel:"albums"
+home-newsLabel:"nieuws"
+home-commentLink:"Bekijk recente opmerkingen..."
+
+# Album page
+album-sortName:"Sorteren op naam"
+album-sortDate:"Sorteren op datum"
+album-sortSize:"Sorteren op omvang (kb)"
+album-sortIntelligent:"Slim sorteren op naam"
+album-sortButton:"Sorteer"
+album-itemCount:"items %firstItem-%lastItem of %totalItems"
+album-noItems:"Geen items gevonden"
+album-oneItem:"1 item"
+album-pageNumber:"pagina&nbsp;%pageNumber"
+album-hasComments:"Bevat opmerkingen"
+album-mainPageLink:"Home"
+album-previousAlbumLink:"Vorige album"
+
+# Image page
+image-backToAlbum:"Terug naar het album"
+image-previousImage:"Vorige foto"
+image-nextImage:"volgende foto"
+image-imageSizeTiny:"tiny"
+image-imageSizeSmall:"small"
+image-imageSizeMedium:"medium"
+image-imageSizeLarge:"large"
+image-imageSizeXLarge:"x-large"
+image-imageSizeOriginal:"origineel"
+image-imageSizeButton:"OK"
+image-infoType:"Soort Foto"
+image-infoFileSize:"Bestandsgrootte"
+image-infoImageSize:"Omvang foto"
+image-infoUploaded:"Ge-uploaded"
+image-infoUploaded1:"%days dagen geleden"
+image-infoUploaded2:"vandaag"
+image-infoCameraMake:"Merk"
+image-infoCameraModel:"Model"
+image-infoFlash:"Flitser"
+image-infoDate:"Genomen op"
+image-infoISO:"ISO"
+image-infoFocalLength:"Focal length"
+image-infoShutter:"Sluitertijd"
+image-infoAperture:"Aperture"
+image-infoEmbedded:"Ingesloten opmerking"
+image-infoUnknown:"Niet bekend"
+image-comments:"Opmerkingen"
+image-noComments:"Deze foto bevat geen opmerkingen."
+image-commentButton:"Opmerking plaatsen"
+image-orderPhotoButton:"Bestel deze foto"
+image-shutterfly:"Deze galerie ondersteunt Shutterfly. Klik op "Bestel deze foto" om een bestelling te plaatsen via Shutterfly."
+
+# Comment Viewer
+commentviewer-label:"recente opmerkingen"
+commentviewer-counter:"%comments van %totalComments opmerkingen weergegeven"
+commentviewer-from:"Van"
+commentviewer-time:"Tijd"
+commentviewer-comment:"Opmerkingen"
+commentviewer-mainPageLink:"Home"
+commentviewer-noComments:"Sorry, geen opmerkingen gevonden."
+
+# Comment Poster
+commentposter-label:"Plaats een opmerking"
+commentposter-post:"Plaats hier uw opmerking mbt deze foto, HTML tags worden automatisch verwijederd."
+commentposter-name:"Uw naam: (optioneel)"
+commentposter-IPaddress:"Uw IP adres"
+commentposter-comment:"Uw opmerkingen:"
+commentposter-previewCommentButton:"Preview opmerkingen"
+commentposter-verify:"Controleer aub uw opmerkingen."
+commentposter-anon:"anoniem"
+commentposter-editCommentButton:"Bewerk opmerking"
+commentposter-postCommentButton:"Plaats opmerking"
+commentposter-success:"Opmerking geplaatst, bedankt!"
+commentposter-linkToImage:"Terug naar foto %imageName"
+commentposter-errorDisabled:"Sorry, de beheerder heeft het plaatsen van opmerkingen uitgeschakeld."
+commentposter-errorBanned:"Sorry, de bevoegdheid voor het plaatsen van opmerkingen is u ontnomen door de beheerder.."
+commentposter-errorBanned1:"Uw opmerking is niet geplaatst, er staan woorden in die niet geaccepteerd worden (scheldwoorden)."
+
+# Search Results
+search-label:"Zoek resultaat"
+search-text:"Zoek tekst"
+search-counter:"%foundItems items gevonden"
+search-counter1:"1 item gevonden"
+search-location:"Locatie"
+search-comments:"Opmerkingen"
+search-lastMod:"Laatst gewijzigd"
+search-noHits:"Sorry, geen items gevonden die aan de door u opgegeven criteria voldoen."
+search-mainPageLink:"Home"
+
+# Error
+error-label:"IDS Fout"
+error-text1:"Er is een fout opgetreden!"
+error-text2:"Als deze fout zich herhaalt neem dan aub contact op met de webmaster."
