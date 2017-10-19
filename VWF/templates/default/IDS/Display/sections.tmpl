@@ -8,14 +8,15 @@
 	</head>
 	<body>
 		[% IF album %]
-			<h1>[% album.title %]</h1>
 			[% IF sections %]
-				<h1>Choose an Section within [% album.title %]</h1>
+				<h1>Choose a Section within [% album.title %]</h1>
 				<ul>
 					[% FOREACH section IN sections %]
 						<li><a href="?page=photographs&entry=[% album.entry %]&section=[% section.section %]">[% section.title %]</a></li>
 					[% END %]
 				</ul>
+				<p><a href="?page=albums">Home</a></p>
+
 			[% ELSE %]
 				This album is empty.
 				Please choose a different <a href="?page=albums">album</a>.
