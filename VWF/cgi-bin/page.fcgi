@@ -56,8 +56,10 @@ Log::WarnDie->dispatcher($logger);
 # eval "require $pagename";
 use IDS::Display::albums;
 use IDS::Display::sections;
+use IDS::Display::photographs;
 use IDS::DB::albums;
 use IDS::DB::sections;
+use IDS::DB::photographs;
 
 my $database_dir = "$script_dir/../databases";
 IDS::DB::init({ directory => $database_dir, logger => $logger });
@@ -68,6 +70,7 @@ if($@) {
 	die $@;
 }
 my $sections = IDS::DB::sections->new();
+my $photographs = IDS::DB::photographs->new();
 
 # open STDERR, ">&STDOUT";
 close STDERR;
@@ -247,6 +250,8 @@ sub doit
 			$display = IDS::Display::albums->new($args);
 		} elsif($page eq 'sections') {
 			$display = IDS::Display::sections->new($args);
+		} elsif($page eq 'photographs') {
+			$display = IDS::Display::photographs->new($args);
 		} else {
 			$invalidpage = 1;
 		}
@@ -263,6 +268,7 @@ sub doit
 		print $display->as_string({
 			albums => $albums,
 			sections => $sections,
+			photographs => $photographs,
 			cachedir => $cachedir
 		});
 	} elsif($invalidpage) {
@@ -288,7 +294,7 @@ sub doit
 
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 				print "Software error - contact the webmaster\n",
-					"$error\n";;
+					"$error\n";
 			}
 		} else {
 			# No permission to show this page
@@ -313,6 +319,7 @@ sub choose
 
 	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		print "/cgi-bin/page.fcgi?page=albums\n",
-			"/cgi-bin/page.fcgi?page=sections\n";
+			"/cgi-bin/page.fcgi?page=sections\n",
+			"/cgi-bin/page.fcgi?page=photographs\n";
 	}
 }
