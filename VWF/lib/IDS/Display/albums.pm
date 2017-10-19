@@ -22,8 +22,8 @@ sub html {
 	my $albums = $args{'albums'};	# Handle into the database
 
 	unless(scalar(keys %params)) {
-		# Display the main index page
-		return $self->SUPER::html(updated => $albums->updated());
+		# Display list of albums
+		return $self->SUPER::html({ updated => $albums->updated(), albums => $albums->selectall_hashref() });
 	}
 
 	# Look in the albums.csv for the name given as the CGI argument and
