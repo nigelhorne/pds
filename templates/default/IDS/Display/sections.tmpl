@@ -1,24 +1,51 @@
-<html>
+<html lang="en" dir="ltr">
 	<head>
+		<meta charset="utf8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<meta http-equiv="Content-Language" content="English">
+		<link rel="stylesheet" href="/css/web.css" type="text/css" media="screen">
+		<link async rel="stylesheet" href="/css/print.css" type="text/css" media="print">
+		<link async rel="stylesheet" href="/css/sprite.css" type="text/css">
 		[% IF album %]
 			<title>[% album.title %]</title>
 		[% ELSE %]
 			<title>TODO - move to the album list</title>
 		[% END %]
+		[% IF twitter %]
+			<meta name="twitter:site" content="@[% twitter %]">
+			<meta name="twitter:title" content="@[% SiteTitle %]">
+		[% END %]
 	</head>
 	<body>
 		[% IF album %]
 			[% IF sections %]
-				<h1>Choose a Section within [% album.title %]</h1>
-				<ul>
-					[% FOREACH section IN sections %]
-						<li><a href="?page=photographs&entry=[% album.entry %]&section=[% section.section %]">[% section.title %]</a></li>
-					[% END %]
-				</ul>
-				<p><a href="?page=albums">Home</a></p>
-
+				<div id="header_container">
+					<center>
+						<h1>[% album.title %]</h1>
+					</center>
+				</div>
+				<div id="container">
+					<center>
+						[ <a href="?page=albums">Home</a> ]
+					</center>
+					<h2>Choose a section within [% album.title %]</h2>
+					<ol>
+						[% FOREACH section IN sections %]
+							<li><a href="?page=photographs&entry=[% album.entry %]&section=[% section.section %]">[% section.title %]</a></li>
+						[% END %]
+					</ol>
+				</div>
 			[% ELSE %]
-				This album is empty.
+				<div id="header_container">
+					<center>
+						<h1>[% album.title %] is empty</h1>
+					</center>
+				</div>
+				<div id="container">
+					<center>
+						[ <a href="?page=albums">Home</a> ]
+					</center>
+				</div>
 				Please choose a different <a href="?page=albums">album</a>.
 			[% END %]
 		[% ELSE %]
