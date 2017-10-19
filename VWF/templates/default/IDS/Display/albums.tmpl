@@ -1,9 +1,9 @@
 <html>
 	<head>
-		<title>Choose an Album</title>
+		<title>[% SiteTitle %]</title>
 	</head>
 	<body>
-		<h1>Choose an Album</h1>
+		<h1>[% SiteTitle %]</h1>
 		<ul>
 			[% FOREACH album IN albums %]
 				<li><a href="?page=sections&entry=[% album.entry %]">[% album.title %]</a></li>

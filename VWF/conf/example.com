@@ -1,4 +1,4 @@
-rootdir: /Users/hornenj/src/njh/ids/VWF
+rootdir: /home/you/imgsite.com
 SiteTitle: Test Picture Site
 Files: a=b
 Files: c=d
@@ -7,4 +7,4 @@ Files: c=d
 disc_cache: driver=File, root_dir=/tmp/cache
 memory_cache: driver=File, root_dir=/tmp/cache
 twitter: nigelhorne
-contact: name=Nigel Horne, email=njh@bandsman.co.uk
+contact: name=Nigel Horne, email=you@example.com
