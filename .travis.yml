@@ -14,6 +14,13 @@ perl:
   - "5.20-extras"
   - "5.18-extras"
 
+before_install:
+  # Needed for Locale::Object
+  - cpanm --installdeps --quiet --notest DBD::SQLite
+  - cpanm --notest --quiet DBD::SQLite Locale::Object::Country Gzip::Faster
+  - sudo apt-get update -q
+  - sudo apt-get install -y libdb-dev libyaml-syck-perl
+
 install:
   - cpanm --skip-satisfied -q -n autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash CHI HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp
 
