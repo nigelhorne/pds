@@ -1,21 +1,13 @@
 <html>
 	<head>
-		[% IF album %]
-			<title>[% album.title %]</title>
-		[% ELSE %]
-			<title>Choose an Album</title>
-		[% END %]
+		<title>Choose an Album</title>
 	</head>
 	<body>
-		[% IF album %]
-			<h1>[% album.title %]</h1>
-		[% ELSE %]
-			<h1>Choose an Album</h1>
-			<ul>
-				[% FOREACH album IN albums %]
-					<li><a href="?page=album&entry=[% album.entry %]">[% album.title %]</a></li>
-				[% END %]
-			</ul>
-		[% END %]
+		<h1>Choose an Album</h1>
+		<ul>
+			[% FOREACH album IN albums %]
+				<li><a href="?page=section&entry=[% album.entry %]">[% album.title %]</a></li>
+			[% END %]
+		</ul>
 	</body>
 </html>

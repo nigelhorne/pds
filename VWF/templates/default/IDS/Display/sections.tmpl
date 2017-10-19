@@ -1,0 +1,27 @@
+<html>
+	<head>
+		[% IF album %]
+			<title>[% album.title %]</title>
+		[% ELSE %]
+			<title>TODO - move to the album list</title>
+		[% END %]
+	</head>
+	<body>
+		[% IF album %]
+			<h1>[% album.title %]</h1>
+			[% IF sections %]
+				<h1>Choose an Section within [% album.title %]</h1>
+				<ul>
+					[% FOREACH section IN sections %]
+						<li><a href="?page=section&entry=[% album.entry %]&section=[% section.section %]">[% section.title %]</a></li>
+					[% END %]
+				</ul>
+			[% ELSE %]
+				This album is empty.
+				Please choose a different <a href="?page=albums">album</a>.
+			[% END %]
+		[% ELSE %]
+			TODO - reload the album list
+		[% END %]
+	</body>
+</html>

@@ -55,8 +55,9 @@ Log::WarnDie->dispatcher($logger);
 # my $pagename = "IDS::Display::$script_name";
 # eval "require $pagename";
 use IDS::Display::albums;
-
+use IDS::Display::sections;
 use IDS::DB::albums;
+use IDS::DB::sections;
 
 my $database_dir = "$script_dir/../databases";
 IDS::DB::init({ directory => $database_dir, logger => $logger });
@@ -66,6 +67,7 @@ if($@) {
 	$logger->error($@);
 	die $@;
 }
+my $sections = IDS::DB::sections->new();
 
 # open STDERR, ">&STDOUT";
 close STDERR;
@@ -243,6 +245,8 @@ sub doit
 		$page =~ s/#.*$//;
 		if($page eq 'albums') {
 			$display = IDS::Display::albums->new($args);
+		} elsif($page eq 'sections') {
+			$display = IDS::Display::sections->new($args);
 		} else {
 			$invalidpage = 1;
 		}
@@ -258,6 +262,7 @@ sub doit
 		# Pass in handles to the databases
 		print $display->as_string({
 			albums => $albums,
+			sections => $sections,
 			cachedir => $cachedir
 		});
 	} elsif($invalidpage) {
@@ -307,6 +312,7 @@ sub choose
 		"Content-type: text/plain\n\n";
 
 	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-		print "/cgi-bin/page.fcgi?page=albums\n";
+		print "/cgi-bin/page.fcgi?page=albums\n",
+			"/cgi-bin/page.fcgi?page=sections\n";
 	}
 }

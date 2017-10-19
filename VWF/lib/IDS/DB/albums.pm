@@ -1,6 +1,6 @@
 package IDS::DB::albums;
 
-# The database associated with the todo template file
+# The database associated with the albums
 
 use IDS::DB;
 
