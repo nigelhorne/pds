@@ -5,9 +5,39 @@ pds
 
 Create a [VWF](//github.com/nigelhorne/vwf) website to display your images.
 
-# Acknowledgements
+Photographs are organized into sections, which in turn are organized into albums.
+For example, you could have an album called "holiday pictures" which contains
+sections such as "trip to India 2017" in which you put your photographs.
 
-Google for the map page
+# Database Format
+
+Each of the above databases (albums, sections, photographs) are stored in simple CSV
+files (XML and SQLite are also supported) in the databases directory.
+The only "gotcha" is that fields are separated by '!' not ','.
+The first line of each file lists the fields in the file.
+
+## albums.csv
+
+Entry | Title
+--- | ---
+Album: "A", followed by a number | Free text
+A1 | Pictures of England
+
+## sections.csv
+
+Entry | Section | Title
+--- | --- | ---
+Album: "A", followed by a number | Section: "S" followed by a number | Free text
+A1 | S1 | Pictures of Margate
+
+## photographs.csv
+
+Entry | Section | Photograph | File | Title
+--- | --- | --- | --- | ---
+Album: "A", followed by a number | Section: "S" followed by a number | Photograph: "P" followed by a number | Filename in /img | Free text
+A1 | S1 | P1 | Margate.jpeg | Margate Clock Tower - taken from the Wikipedia page
+
+# Acknowledgements
 
 So many Perl CPAN modules that if I list them all I'll miss one.
 
@@ -15,15 +45,11 @@ Magnific Popup http://dimsemenov.com/plugins/magnific-popup/
 
 # TODO
 
-* CSSify all pages.
-
 * Thumbnails and Image::Info
 
-* Better presentation of the actual pages with photographs.
-Use the caption option of magnific-popup
-Look into http://dimsemenov.com/plugins/magnific-popup/ (single image pop-up)
-
 * Finish print.css
+
+* /img should be hierachichal, not a monolithic directory
 
 # LICENSE AND COPYRIGHT
 
