@@ -1,4 +1,4 @@
-package IDS::Display;
+package PDS::Display;
 
 # Display a page. Certain variables are available to all templates, such as
 # the stuff in the configuration file
@@ -6,8 +6,8 @@ package IDS::Display;
 use strict;
 use warnings;
 
-use IDS::Config;
-use IDS::Allow;
+use PDS::Config;
+use PDS::Allow;
 use CGI::Info;
 use Error;
 use Fatal qw(:void open);
@@ -26,7 +26,7 @@ sub new {
 	my $class = ref($proto) || $proto;
 
 	my $info = $args{info} || CGI::Info->new();
-	my $config = $args{config} || IDS::Config->new({ logger => $args{logger}, info => $info, lingua => $args{lingua} });
+	my $config = $args{config} || PDS::Config->new({ logger => $args{logger}, info => $info, lingua => $args{lingua} });
 
 	unless($info->is_search_engine() || !defined($ENV{'REMOTE_ADDR'})) {
 		my %allowargs = (
@@ -37,7 +37,7 @@ sub new {
 			cachedir => $args{cachedir},
 			cache => $args{cache}
 		);
-		unless(IDS::Allow::allow(%allowargs)) {
+		unless(PDS::Allow::allow(%allowargs)) {
 			throw Error::Simple("Not allowing connexion from $ENV{'REMOTE_ADDR'}", 1);
 		}
 	}
@@ -190,7 +190,8 @@ sub http {
 }
 
 sub html {
-	my ($self, $params) = @_;
+	my $self = shift;
+	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $filename = $self->get_template_path();
 	my $rc;
@@ -215,11 +216,11 @@ sub html {
 			} else {
 				$vals = $self->{_config};
 			}
-			if(defined($params)) {
-				$vals = { %{$vals}, %{$params} };
+			if(scalar(keys %params)) {
+				$vals = { %{$vals}, %params };
 			}
-		} elsif(defined($params)) {
-			$vals = { %{$info->params()}, %{$params} };
+		} elsif(scalar(keys %params)) {
+			$vals = { %{$info->params()}, %params };
 		} else {
 			$vals = $info->params();
 		}
@@ -308,7 +309,6 @@ sub _pfopen {
 		return $savedpaths->{$candidate};
 	}
 
-	$self->_debug({ message => "_pfopen: path=$path; prefix = $prefix" });
 	foreach my $dir(split(/:/, $path)) {
 		next unless(-d $dir);
 		if($suffixes) {
