@@ -1,11 +1,9 @@
+<!DOCTYPE html>
 <html lang="en" dir="ltr">
 	<head>
 		<meta charset="utf8">
 		<meta http-equiv="x-ua-compatible" content="ie=edge">
 		<meta http-equiv="Content-Language" content="English">
-		<link rel="stylesheet" href="/css/web.css" type="text/css" media="screen">
-		<link async rel="stylesheet" href="/css/print.css" type="text/css" media="print">
-		<link async rel="stylesheet" href="/css/sprite.css" type="text/css">
 		[% IF twitter %]
 			<meta name="twitter:site" content="@[% twitter %]">
 			<meta name="twitter:title" content="@[% SiteTitle %]">
@@ -17,6 +15,11 @@
 		[% ELSE %]
 			<title>TODO - move to the album list</title>
 		[% END %]
+		<link rel="stylesheet" href="/css/web.css" type="text/css" media="screen">
+		<link async rel="stylesheet" href="/css/print.css" type="text/css" media="print">
+		<link async rel="stylesheet" href="/css/sprite.css" type="text/css">
+                <link async rel="stylesheet" href="/css/sprite.css" type="text/css">
+		<link rel="stylesheet" href="/css/magnific-popup.css" type="text/css" media="screen">
 	</head>
 	<body>
 		[% IF section %]
@@ -33,10 +36,13 @@
 					</center>
 					<ol>
 						[% FOREACH photograph IN photographs %]
+							<!--
 							<li><a href="/img/[% photograph.file %]" target="_blank">[% photograph.title %]</a></li>
+							-->
+							<a class="popup-link" href="/img/[% photograph.file %]">[% photograph.title %]</a>
 						[% END %]
 					</ol>
-				</vid>
+				</div>
 			[% ELSE %]
 				<div id="header_container">
 					<center>
@@ -65,5 +71,12 @@
 				[% END %]
 			</i>
 		</p>
+		<script src="//ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+		<script src="//cdnjs.cloudflare.com/ajax/libs/magnific-popup.js/1.1.0/jquery.magnific-popup.min.js"></script>
+		<script>
+			\$(document).ready(function() {
+			  \$('.popup-link').magnificPopup({type:'image'});
+			});
+		</script>
 	</body>
 </html>

@@ -5,6 +5,14 @@ pds
 
 Create a [VWF](//github.com/nigelhorne/vwf) website to display your images.
 
+# Acknowledgements
+
+Google for the map page
+
+So many Perl CPAN modules that if I list them all I'll miss one.
+
+Magnific Popup http://dimsemenov.com/plugins/magnific-popup/
+
 # TODO
 
 * CSSify all pages.
@@ -12,6 +20,7 @@ Create a [VWF](//github.com/nigelhorne/vwf) website to display your images.
 * Thumbnails and Image::Info
 
 * Better presentation of the actual pages with photographs.
+Use the caption option of magnific-popup
 Look into http://dimsemenov.com/plugins/magnific-popup/ (single image pop-up)
 
 * Finish print.css
