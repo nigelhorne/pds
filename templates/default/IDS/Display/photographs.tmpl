@@ -36,10 +36,12 @@
 					</center>
 					<ol>
 						[% FOREACH photograph IN photographs %]
-							<!--
-							<li><a href="/img/[% photograph.file %]" target="_blank">[% photograph.title %]</a></li>
-							-->
-							<a class="popup-link" href="/img/[% photograph.file %]" title="[% photograph.title %]">[% photograph.title %]</a>
+							<li>
+								<!--
+								<a href="/img/[% photograph.file %]" target="_blank">[% photograph.title %]</a>
+								-->
+								<a class="popup-link" href="/img/[% photograph.file %]" title="[% photograph.title %]">[% photograph.title %]</a>
+							</li>
 						[% END %]
 					</ol>
 				</div>
