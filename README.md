@@ -37,6 +37,20 @@ Entry | Section | Photograph | File | Title
 Album: "A", followed by a number | Section: "S" followed by a number | Photograph: "P" followed by a number | Filename in /img | Free text
 A1 | S1 | P1 | Margate.jpeg | Margate Clock Tower - taken from the Wikipedia page
 
+# Installation
+
+Create a $hostname.com file in the conf directory
+(use example.com as a template),
+then modify the contents of the template tree so that the site looks as you
+want it.
+The configuration file can be in any number of formats including INI and XML.
+
+    rootdir: /full/path/to/website directory
+    SiteTitle: The title of your website
+    memory_cache: where short-term volatile information is stored, such as the country of origin of the client
+    disc_cache: where long-term information is stored, such as copies of output to see if HTTP 304 can be returned
+    contact: your name and e-mail address
+
 # Acknowledgements
 
 So many Perl CPAN modules that if I list them all I'll miss one.
