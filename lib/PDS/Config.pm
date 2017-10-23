@@ -1,6 +1,6 @@
-package IDS::Config;
+package PDS::Config;
 
-# IDS is licensed under GPL2.0 for personal use only
+# PDS is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
 # Site independant configuration file

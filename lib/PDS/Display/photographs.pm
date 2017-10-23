@@ -1,8 +1,8 @@
-package IDS::Display::photographs;
+package PDS::Display::photographs;
 
-use IDS::Display;
+use PDS::Display;
 
-our @ISA = ('IDS::Display');
+our @ISA = ('PDS::Display');
 
 sub html {
 	my $self = shift;

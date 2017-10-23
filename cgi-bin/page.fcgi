@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 
-# IDS is licensed under GPL2.0 for personal use only
+# PDS is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
 # Based on VWF - https://github.com/nigelhorne/vwf
@@ -29,12 +29,12 @@ use File::Spec;
 use Log::WarnDie 0.09;
 use autodie qw(:all);
 
-# use lib '/usr/lib';	# This needs to point to the IDS directory lives,
+# use lib '/usr/lib';	# This needs to point to the PDS directory lives,
 			# i.e. the contents of the lib directory in the
 			# distribution
 use lib '../lib';
 
-use IDS::Config;
+use PDS::Config;
 
 my $info = CGI::Info->new();
 my $tmpdir = $info->tmpdir();
@@ -53,25 +53,25 @@ Log::Log4perl->init("$script_dir/../conf/$script_name.l4pconf");
 my $logger = Log::Log4perl->get_logger($script_name);
 Log::WarnDie->dispatcher($logger);
 
-# my $pagename = "IDS::Display::$script_name";
+# my $pagename = "PDS::Display::$script_name";
 # eval "require $pagename";
-use IDS::Display::albums;
-use IDS::Display::sections;
-use IDS::Display::photographs;
-use IDS::DB::albums;
-use IDS::DB::sections;
-use IDS::DB::photographs;
+use PDS::Display::albums;
+use PDS::Display::sections;
+use PDS::Display::photographs;
+use PDS::DB::albums;
+use PDS::DB::sections;
+use PDS::DB::photographs;
 
 my $database_dir = "$script_dir/../databases";
-IDS::DB::init({ directory => $database_dir, logger => $logger });
+PDS::DB::init({ directory => $database_dir, logger => $logger });
 
-my $albums = IDS::DB::albums->new();
+my $albums = PDS::DB::albums->new();
 if($@) {
 	$logger->error($@);
 	die $@;
 }
-my $sections = IDS::DB::sections->new();
-my $photographs = IDS::DB::photographs->new();
+my $sections = PDS::DB::sections->new();
+my $photographs = PDS::DB::photographs->new();
 
 # open STDERR, ">&STDOUT";
 close STDERR;
@@ -170,7 +170,7 @@ sub doit
 	$logger->debug('In doit - domain is ', $info->domain_name());
 
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
-	$config ||= IDS::Config->new({ logger => $logger, info => $info });
+	$config ||= PDS::Config->new({ logger => $logger, info => $info });
 	$infocache ||= create_memory_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
 
 	my $options = {
@@ -248,11 +248,11 @@ sub doit
 		my $page = $info->param('page');
 		$page =~ s/#.*$//;
 		if($page eq 'albums') {
-			$display = IDS::Display::albums->new($args);
+			$display = PDS::Display::albums->new($args);
 		} elsif($page eq 'sections') {
-			$display = IDS::Display::sections->new($args);
+			$display = PDS::Display::sections->new($args);
 		} elsif($page eq 'photographs') {
-			$display = IDS::Display::photographs->new($args);
+			$display = PDS::Display::photographs->new($args);
 		} else {
 			$invalidpage = 1;
 		}

@@ -1,4 +1,4 @@
-package IDS::DB;
+package PDS::DB;
 
 use warnings;
 use strict;
@@ -27,7 +27,7 @@ sub new {
 	return bless { logger => $args{'logger'} || $logger, directory => $args{'directory'} || $directory }, $class;
 }
 
-# Can also be run as a class level IDS::DB::init(directory => '../databases')
+# Can also be run as a class level PDS::DB::init(directory => '../databases')
 sub init {
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 

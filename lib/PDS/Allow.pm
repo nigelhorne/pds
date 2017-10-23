@@ -1,10 +1,10 @@
-use IDS::Utils;
+use PDS::Utils;
 
 # See https://github.com/nigelhorne/CGI-Allow
 
-package IDS::Allow;
+package PDS::Allow;
 
-# IDS is licensed under GPL2.0 for personal use only
+# PDS is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
 use strict;
