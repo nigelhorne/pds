@@ -37,6 +37,10 @@ Entry | Section | Photograph | File | Title
 Album: "A", followed by a number | Section: "S" followed by a number | Photograph: "P" followed by a number | Filename in /img | Free text
 A1 | S1 | P1 | Margate.jpeg | Margate Clock Tower - taken from the Wikipedia page
 
+## /img
+
+The images are put in album/section, in the above example that means .../img/A1/S1/Margate.jpeg
+
 # Installation
 
 Create a $hostname.com file in the conf directory
@@ -62,8 +66,6 @@ Magnific Popup http://dimsemenov.com/plugins/magnific-popup/
 * Thumbnails and Image::Info
 
 * Finish print.css
-
-* /img should be hierachichal, not a monolithic directory
 
 # LICENSE AND COPYRIGHT
 
