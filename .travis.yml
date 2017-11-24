@@ -26,3 +26,4 @@ install:
 
 script:
   - cd cgi-bin && perl -c -MO=Lint ./page.fcgi '' && perl -c -Mwarnings::unused ./page.fcgi ''
+  - perl cgi-bin/index.fcgi page=albums
