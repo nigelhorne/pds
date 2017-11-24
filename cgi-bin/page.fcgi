@@ -239,6 +239,7 @@ sub doit
 	my $display;
 	my $invalidpage;
 	$args = {
+		cachedir => $cachedir,
 		info => $info,
 		logger => $logger,
 		lingua => $lingua,
