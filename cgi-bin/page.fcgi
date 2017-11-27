@@ -256,6 +256,7 @@ sub doit
 		} elsif($page eq 'photographs') {
 			$display = PDS::Display::photographs->new($args);
 		} else {
+			$logger->info("Unknown page $page");
 			$invalidpage = 1;
 		}
 	};
@@ -275,7 +276,6 @@ sub doit
 			cachedir => $cachedir
 		});
 	} elsif($invalidpage) {
-		$logger->info("Unknown page $page")
 		choose();
 		return;
 	} else {
