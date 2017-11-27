@@ -188,6 +188,7 @@ sub doit
 	$info = CGI::Info->new($options);
 
 	if(!defined($info->param('page'))) {
+		$logger->info('No page given in ', $info->as_string());
 		choose();
 		return;
 	}
@@ -274,6 +275,7 @@ sub doit
 			cachedir => $cachedir
 		});
 	} elsif($invalidpage) {
+		$logger->info("Unknown page $page")
 		choose();
 		return;
 	} else {
