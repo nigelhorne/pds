@@ -91,7 +91,8 @@ sub new {
 	}
 	my $config;
 	eval {
-		if($args{logger}) { $args{logger}->debug("Configuration path: $path/", $info->domain_name());
+		if($args{logger}) {
+			$args{logger}->debug("Configuration path: $path/", $info->domain_name());
 		}
 		if(-r File::Spec->catdir($path, $info->domain_name())) {
 			$config = Config::Auto::parse($info->domain_name(), path => $path);
