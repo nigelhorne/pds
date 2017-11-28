@@ -44,7 +44,7 @@ The images are put in album/section, in the above example that means .../img/A1/
 # Installation
 
 Create a $hostname.com file in the conf directory
-(use example.com as a template),
+(use default as a template),
 then modify the contents of the template tree so that the site looks as you
 want it.
 The configuration file can be in any number of formats including INI and XML.
