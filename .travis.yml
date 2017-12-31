@@ -22,7 +22,7 @@ before_install:
   - sudo apt-get install -y libdb-dev libyaml-syck-perl libchi-perl libconfig-auto-perl
 
 install:
-  - cpanm --skip-satisfied -q -n autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo
+  - cpanm --skip-satisfied -q -n autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo DBD::CSV
 
 script:
   - cd cgi-bin && perl -c -MO=Lint ./page.fcgi '' && perl -c -Mwarnings::unused ./page.fcgi ''
