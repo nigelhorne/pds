@@ -59,6 +59,7 @@ Log::WarnDie->dispatcher($logger);
 use PDS::Display::albums;
 use PDS::Display::sections;
 use PDS::Display::photographs;
+use PDS::Display::upload;
 use PDS::DB::albums;
 use PDS::DB::sections;
 use PDS::DB::photographs;
@@ -256,6 +257,8 @@ sub doit
 			$display = PDS::Display::sections->new($args);
 		} elsif($page eq 'photographs') {
 			$display = PDS::Display::photographs->new($args);
+		} elsif($page eq 'upload') {
+			$display = PDS::Display::upload->new($args);
 		} else {
 			$logger->info("Unknown page $page");
 			$invalidpage = 1;
@@ -334,6 +337,7 @@ sub choose
 	unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
 		print "/cgi-bin/page.fcgi?page=albums\n",
 			"/cgi-bin/page.fcgi?page=sections\n",
-			"/cgi-bin/page.fcgi?page=photographs\n";
+			"/cgi-bin/page.fcgi?page=photographs\n",
+			"/cgi-bin/page.fcgi?page=upload\n";
 	}
 }
