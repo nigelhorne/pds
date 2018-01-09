@@ -224,7 +224,7 @@ sub doit
 	}
 
 	my $fb = FCGI::Buffer->new();
-	
+
 	$fb->init($args);
 
 	if($fb->can_cache()) {
@@ -248,6 +248,7 @@ sub doit
 		lingua => $lingua,
 		config => $config,
 	};
+
 	eval {
 		my $page = $info->param('page');
 		$page =~ s/#.*$//;
@@ -321,6 +322,8 @@ sub doit
 sub choose
 {
 	$logger->info('Called with no page to display');
+
+	return if($info->status() != 200);
 
 	print "Status: 300 Multiple Choices\n",
 		"Content-type: text/plain\n";
