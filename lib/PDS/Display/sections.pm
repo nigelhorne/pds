@@ -23,8 +23,7 @@ sub html {
 
 	unless(scalar(keys %params)) {
 		# No album chosen, list them all
-		# FIXME: should display the album list
-		return $self->SUPER::html(updated => $sections->updated());
+		return $self->SUPER::html({ updated => $sections->updated() });
 	}
 
 	# Look in the sections.csv for the name given as the CGI argument and
