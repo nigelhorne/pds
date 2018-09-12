@@ -1,6 +1,12 @@
 package PDS::Display::photographs;
 
+use strict;
+use warnings;
+
 use PDS::Display;
+use File::Basename;
+use File::Spec;
+use Image::Magick::Thumbnail;
 
 our @ISA = ('PDS::Display');
 
@@ -60,13 +66,42 @@ sub html {
 
 	my $albums = $args{'albums'};
 	my $sections = $args{'sections'};
+	my $pics = $photographs->selectall_hashref(\%params);
+	my $rootdir = $self->{_config}->{rootdir} || $self->{_info}->rootdir();
+
+	foreach my $pic(@{$pics}) {
+		my $thumbnail = File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
+		if(!-r $thumbnail) {
+			mkdirp(File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
+
+			# Create a thumbnail
+			my $im = Image::Magick->new();
+			my $image = File::Spec->catfile($rootdir, 'img', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
+			$im->read($image);
+			my ($thumb, $x, $y) = Image::Magick::Thumbnail::create($im, 100);
+			# use PNG to try to avoid
+			#	'Warning: No loadimage plugin for "jpeg:cairo"'
+			$thumbnail =~ s/\.jpg$/.png/i;
+			$thumb->Write($thumbnail);
+			chmod 0444, $thumbnail;
+		}
+		$pic->{'thumbnail'} = $thumbnail;
+	}
 
 	return $self->SUPER::html({
-		photographs => $photographs->selectall_hashref(\%params),
+		photographs => $pics,
 		album => $albums->fetchrow_hashref(entry => $params{'entry'}),
 		section => $sections->fetchrow_hashref(\%params),
 		updated => $photographs->updated()
 	});
+}
+
+# https://www.perlmonks.org/?node_id=366292
+sub mkdirp() {
+	my $dir = shift;
+	return if (-d $dir);
+	mkdirp(dirname($dir));
+	mkdir($dir);
 }
 
 1;
