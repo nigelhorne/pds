@@ -4,6 +4,28 @@ use PDS::Display;
 
 our @ISA = ('PDS::Display');
 
+sub http {
+	my $self = shift;
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	my $info = $self->{_info};
+	my $allowed = {
+		'page' => 'photographs',
+		'section' => qr/^S\d+$/,	# Takes a section as a parameter
+		'entry' => qr/^A\d+$/,	# Takes an album as a parameter
+		'lang' => qr/^[A-Z][A-Z]/i,
+	};
+	my %params = %{$info->params({ allow => $allowed })};
+
+	if(defined($params{'entry'}) && defined($params{'section'})) {
+		return $self->SUPER::http();
+	}
+
+	# No section chosen, go home
+	my $script = $info->script_name();
+	return "Location: $script?page=albums";
+}
+
 sub html {
 	my $self = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
@@ -21,10 +43,14 @@ sub html {
 	delete $params{'lang'};
 
 	my $photographs = $args{'photographs'};	# Handle into the database
+	if(!defined($photographs)) {
+		if(my $logger = $self->{_logger}) {
+			$logger->warn('photographs not defined');
+		}
+		return;
+	}
 
 	unless(scalar(keys %params)) {
-		# No album chosen, list them all
-		# FIXME: should display the album list
 		return $self->SUPER::html(updated => $photographs->updated());
 	}
 

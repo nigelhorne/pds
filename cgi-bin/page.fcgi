@@ -8,6 +8,9 @@
 # use File::HomeDir;
 # use lib File::HomeDir->my_home() . '/lib/perl5';
 
+# Can be tested at the command line, e.g.:
+# rootdir=$(pwd)/.. ./page.fcgi page=index
+
 use strict;
 use warnings;
 # use diagnostics;
