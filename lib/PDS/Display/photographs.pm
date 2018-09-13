@@ -6,7 +6,6 @@ use warnings;
 use PDS::Display;
 use File::Basename;
 use File::Spec;
-use Image::Magick::Thumbnail;
 
 our @ISA = ('PDS::Display');
 
@@ -73,6 +72,9 @@ sub html {
 		my $thumbnail = File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
 		$thumbnail =~ s/\.jpg$/.png/i;
 		if(!-r $thumbnail) {
+			require Image::Magick::Thumbnail;
+			Image::Magick::Thumbnail->import();
+
 			mkdirp(File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
 
 			# Create a thumbnail
@@ -85,6 +87,8 @@ sub html {
 			$thumb->Write($thumbnail);
 			chmod 0444, $thumbnail;
 		}
+		$thumbnail = '/thumbs/' . $pic->{'entry'} . '/' . $pic->{'section'} . '/' . $pic->{'file'};
+		$thumbnail =~ s/\.jpg$/.png/i;
 		$pic->{'thumbnail'} = $thumbnail;
 	}
 
@@ -97,7 +101,7 @@ sub html {
 }
 
 # https://www.perlmonks.org/?node_id=366292
-sub mkdirp() {
+sub mkdirp {
 	my $dir = shift;
 	return if (-d $dir);
 	mkdirp(dirname($dir));
