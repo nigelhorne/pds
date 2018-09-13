@@ -71,6 +71,7 @@ sub html {
 
 	foreach my $pic(@{$pics}) {
 		my $thumbnail = File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
+		$thumbnail =~ s/\.jpg$/.png/i;
 		if(!-r $thumbnail) {
 			mkdirp(File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
 
@@ -81,7 +82,6 @@ sub html {
 			my ($thumb, $x, $y) = Image::Magick::Thumbnail::create($im, 100);
 			# use PNG to try to avoid
 			#	'Warning: No loadimage plugin for "jpeg:cairo"'
-			$thumbnail =~ s/\.jpg$/.png/i;
 			$thumb->Write($thumbnail);
 			chmod 0444, $thumbnail;
 		}
