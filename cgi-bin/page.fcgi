@@ -30,6 +30,7 @@ use Log::Any::Adapter;
 use Error qw(:try);
 use File::Spec;
 use Log::WarnDie 0.09;
+use CGI::ACL;
 use HTTP::Date;
 use autodie qw(:all);
 
@@ -42,7 +43,6 @@ use PDS::Config;
 
 my $info = CGI::Info->new();
 my $tmpdir = $info->tmpdir();
-my $cachedir = "$tmpdir/cache";
 my $script_dir = $info->script_dir();
 my $config;
 
@@ -87,6 +87,12 @@ my $requestcount = 0;
 my $handling_request = 0;
 my $exit_requested = 0;
 
+my @blacklist_country_list = (
+	'RU', 'CN',
+);
+
+my $acl = CGI::ACL->new()->deny_country(country => \@blacklist_country_list)->allow_ip('131.161.0.0/16');
+
 sub sig_handler {
 	$exit_requested = 1;
 	$logger->trace('In sig_handler');
@@ -96,6 +102,7 @@ sub sig_handler {
 			$buffercache->purge();
 		}
 		CHI->stats->flush();
+		Log::WarnDie->dispatcher(undef);
 		exit(0);
 	}
 }
@@ -166,6 +173,7 @@ if($buffercache) {
 	$buffercache->purge();
 }
 CHI->stats->flush();
+Log::WarnDie->dispatcher(undef);
 exit(0);
 
 sub doit
@@ -208,6 +216,19 @@ sub doit
 		syslog => $syslog,
 	});
 
+	if($ENV{'REMOTE_ADDR'} && ($acl->all_denied(lingua => $lingua))) {
+		print "Status: 403 Forbidden\n",
+			"Content-type: text/plain\n",
+			"Pragma: no-cache\n\n";
+
+		unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
+			print "Access Denied\n";
+		}
+		# $logger->info($ENV{'REMOTE_ADDR'} . ': access denied');
+		$logger->warn($ENV{'REMOTE_ADDR'}, ': access denied');
+		return;
+	}
+
 	my $args = {
 		info => $info,
 		optimise_content => 1,
@@ -226,10 +247,9 @@ sub doit
 		};
 	}
 
-	my $fb = FCGI::Buffer->new();
+	my $fb = FCGI::Buffer->new()->init($args);
 
-	$fb->init($args);
-
+	my $cachedir = $args{'cachedir'} || $config->{disc_cache}->{root_dir} || "$tmpdir/cache";
 	if($fb->can_cache()) {
 		$buffercache ||= create_disc_cache(config => $config, logger => $logger, namespace => $script_name, root_dir => $cachedir);
 		$fb->init(
@@ -315,7 +335,7 @@ sub doit
 				"Pragma: no-cache\n\n";
 
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-				print "There is a problem with your connection. Please contact your ISP.\n";
+				print "There is a problem with your connection. Please contact your ISP. ($error)\n";
 			}
 		}
 		throw Error::Simple($error ? $error : $info->as_string());
@@ -326,7 +346,7 @@ sub choose
 {
 	$logger->info('Called with no page to display');
 
-	return if($info->status() != 200);
+	return unless($info->status() == 200);
 
 	print "Status: 300 Multiple Choices\n",
 		"Content-type: text/plain\n";
