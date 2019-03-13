@@ -1,9 +1,42 @@
 package PDS::DB;
 
+# Author Nigel Horne: njh@bandsman.co.uk
+# Copyright (C) 2015-2019, Nigel Horne
+
+# Usage is subject to licence terms.
+# The licence terms of this software are as follows:
+# Personal single user, single computer use: GPL2
+# All other users (including Commercial, Charity, Educational, Government)
+#	must apply in writing for a licence for use from Nigel Horne at the
+#	above e-mail.
+
+# Abstract class giving read-only access to CSV, XML and SQLite databases via Perl without writing any SQL.
+# Look for databases in $directory in this order;
+#	SQLite (file ends with .sql)
+#	CSV (file ends with .csv or .db, can be gzipped)
+#	XML (file ends with .xml)
+
+# For example, you can access the files in /var/db/foo.csv via this class:
+
+# package MyPackageName::DB::foo;
+
+# use PDS::DB;
+
+# our @ISA = ('PDS::DB');
+
+# 1;
+
+# You can then access the data using:
+# my $foo = MyPackageName::DB::foo->new(directory => '/var/db');
+# my $row = $foo->fetchrow_hashref(customer_id => '12345);
+# print Data::Dumper->new([$row])->Dump();
+
+# TODO: support a directory hierachy of databases
+# TODO: consider returning an object or array of objects, rather than hashes
+
 use warnings;
 use strict;
 
-use File::Glob;
 use File::Basename;
 use DBI;
 use File::Spec;
@@ -12,10 +45,12 @@ use File::Temp;
 use Gzip::Faster;
 use DBD::SQLite::Constants qw/:file_open/;	# For SQLITE_OPEN_READONLY
 use Error::Simple;
+use Carp;
 
 our @databases;
 our $directory;
 our $logger;
+our $cache;
 
 sub new {
 	my $proto = shift;
@@ -23,9 +58,19 @@ sub new {
 
 	my $class = ref($proto) || $proto;
 
+	if($class eq 'PDS::DB') {
+		die "$class: abstract class";
+	}
+
+	die "$class: where are the files?" unless($directory || $args{'directory'});
 	# init(\%args);
 
-	return bless { logger => $args{'logger'} || $logger, directory => $args{'directory'} || $directory }, $class;
+	return bless {
+		logger => $args{'logger'} || $logger,
+		directory => $args{'directory'} || $directory,	# The directory conainting the tables in XML, SQLite or CSV format
+		cache => $args{'cache'} || $cache,
+		table => $args{'table'}	# The name of the file containing the table, defaults to the class name
+	}, $class;
 }
 
 # Can also be run as a class level PDS::DB::init(directory => '../databases')
@@ -34,10 +79,10 @@ sub init {
 
 	$directory ||= $args{'directory'};
 	$logger ||= $args{'logger'};
+	$cache ||= $args{'cache'};
 	if($args{'databases'}) {
 		@databases = $args{'databases'};
 	}
-	throw Error::Simple('directory not given') unless($directory);
 }
 
 sub set_logger {
@@ -47,6 +92,8 @@ sub set_logger {
 
 	if(ref($_[0]) eq 'HASH') {
 		%args = %{$_[0]};
+	} elsif(!ref($_[0])) {
+		Carp::croak('Usage: set_logger(logger => $logger)');
 	} elsif(scalar(@_) % 2 == 0) {
 		%args = @_;
 	} else {
@@ -56,6 +103,8 @@ sub set_logger {
 	$self->{'logger'} = $args{'logger'};
 }
 
+# Open the database.
+
 sub _open {
 	my $self = shift;
 	my %args = (
@@ -63,7 +112,7 @@ sub _open {
 		((ref($_[0]) eq 'HASH') ? %{$_[0]} : @_)
 	);
 
-	my $table = ref($self);
+	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
 	if($self->{'logger'}) {
@@ -74,26 +123,32 @@ sub _open {
 	# Read in the database
 	my $dbh;
 
-	my $directory = $self->{'directory'} || $directory;
-	my $slurp_file = File::Spec->catfile($directory, "$table.sql");
+	my $dir = $self->{'directory'} || $directory;
+	my $slurp_file = File::Spec->catfile($dir, "$table.sql");
+	if($self->{'logger'}) {
+		$self->{'logger'}->debug("_open: try to open $slurp_file");
+	}
 
 	if(-r $slurp_file) {
 		$dbh = DBI->connect("dbi:SQLite:dbname=$slurp_file", undef, undef, {
 			sqlite_open_flags => SQLITE_OPEN_READONLY,
 		});
+		$dbh->do('PRAGMA synchronous = OFF');
+		$dbh->do('PRAGMA cache_size = 65536');
 		if($self->{'logger'}) {
 			$self->{'logger'}->debug("read in $table from SQLite $slurp_file");
 		}
 	} else {
 		my $fin;
-		($fin, $slurp_file) = File::pfopen::pfopen($directory, $table, 'csv.gz:db.gz');
+		($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv.gz:db.gz');
 		if(defined($slurp_file) && (-r $slurp_file)) {
+			close($fin);
 			$fin = File::Temp->new(SUFFIX => '.csv', UNLINK => 0);
 			print $fin gunzip_file($slurp_file);
 			$slurp_file = $fin->filename();
 			$self->{'temp'} = $slurp_file;
 		} else {
-			($fin, $slurp_file) = File::pfopen::pfopen($directory, $table, 'csv:db');
+			($fin, $slurp_file) = File::pfopen::pfopen($dir, $table, 'csv:db');
 		}
 		if(defined($slurp_file) && (-r $slurp_file)) {
 			close($fin);
@@ -104,8 +159,8 @@ sub _open {
 						csv_tables => {
 							$table => {
 								col_names => $args{'column_names'},
-							}
-						}
+							},
+						},
 					}
 				);
 			} else {
@@ -117,7 +172,7 @@ sub _open {
 				$self->{'logger'}->debug("read in $table from CSV $slurp_file");
 			}
 
-			my %options = (
+			$dbh->{csv_tables}->{$table} = {
 				allow_loose_quotes => 1,
 				blank_is_undef => 1,
 				empty_is_undef => 1,
@@ -125,9 +180,33 @@ sub _open {
 				f_file => $slurp_file,
 				escape_char => '\\',
 				sep_char => $sep_char,
-			);
+				auto_diag => 1,
+				# Don't do this, it causes "Attempt to free unreferenced scalar"
+				# callbacks => {
+					# after_parse => sub {
+						# my ($csv, @rows) = @_;
+						# my @rc;
+						# foreach my $row(@rows) {
+							# if($row->[0] !~ /^#/) {
+								# push @rc, $row;
+							# }
+						# }
+						# return @rc;
+					# }
+				# }
+			};
 
-			$dbh->{csv_tables}->{$table} = \%options;
+			# my %options = (
+				# allow_loose_quotes => 1,
+				# blank_is_undef => 1,
+				# empty_is_undef => 1,
+				# binary => 1,
+				# f_file => $slurp_file,
+				# escape_char => '\\',
+				# sep_char => $sep_char,
+			# );
+
+			# $dbh->{csv_tables}->{$table} = \%options;
 			# delete $options{f_file};
 
 			# require Text::CSV::Slurp;
@@ -151,8 +230,8 @@ sub _open {
 				file => $slurp_file
 			)};
 
-			# Don't use blank lines or comments
-			@data = grep { $_->{'entry'} !~ /^#/ } grep { defined($_->{'entry'}) } @data;
+			# Ignore blank lines or lines starting with # in the CSV file
+			@data = grep { $_->{'entry'} !~ /^\s*#/ } grep { defined($_->{'entry'}) } @data;
 			# $self->{'data'} = @data;
 			my $i = 0;
 			$self->{'data'} = ();
@@ -160,7 +239,7 @@ sub _open {
 				$self->{'data'}[$i++] = $d;
 			}
 		} else {
-			$slurp_file = File::Spec->catfile($directory, "$table.xml");
+			$slurp_file = File::Spec->catfile($dir, "$table.xml");
 			if(-r $slurp_file) {
 				$dbh = DBI->connect('dbi:XMLSimple(RaiseError=>1):');
 				$dbh->{'RaiseError'} = 1;
@@ -169,7 +248,7 @@ sub _open {
 				}
 				$dbh->func($table, 'XML', $slurp_file, 'xmlsimple_import');
 			} else {
-				throw Error::Simple("Can't open $directory/$table");
+				throw Error::Simple("Can't open $dir/$table");
 			}
 		}
 	}
@@ -185,83 +264,152 @@ sub _open {
 # the given criteria
 sub selectall_hashref {
 	my $self = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my @rc = $self->selectall_hash(@_);
+	return \@rc;
+}
 
-	my $table = ref($self);
+# Returns an array of hash references
+sub selectall_hash {
+	my $self = shift;
+	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+
+	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
 	$self->_open() if(!$self->{$table});
 
-	if((scalar(keys %args) == 0) && $self->{'data'}) {
+	if((scalar(keys %params) == 0) && $self->{'data'}) {
 		if($self->{'logger'}) {
-			$self->{'logger'}->trace("$table: selectall_hashref fast track return");
+			$self->{'logger'}->trace("$table: selectall_hash fast track return");
 		}
-		return $self->{'data'};
+		return @{$self->{'data'}};
 	}
+	# if((scalar(keys %params) == 1) && $self->{'data'} && defined($params{'entry'})) {
+	# }
 
 	my $query = "SELECT * FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
-	my @args;
-	foreach my $c1(keys(%args)) {
+	my @query_args;
+	foreach my $c1(sort keys(%params)) {	# sort so that the key is always the same
 		$query .= " AND $c1 LIKE ?";
-		push @args, $args{$c1};
+		push @query_args, $params{$c1};
 	}
 	$query .= ' ORDER BY entry';
 	if($self->{'logger'}) {
-		$self->{'logger'}->debug("selectall_hashref $query: " . join(', ', @args));
+		if(defined($query_args[0])) {
+			$self->{'logger'}->debug("selectall_hash $query: ", join(', ', @query_args));
+		} else {
+			$self->{'logger'}->debug("selectall_hash $query");
+		}
 	}
-	my $sth = $self->{$table}->prepare($query);
-	$sth->execute(@args) || throw Error::Simple("$query: @args");
-	my @rc;
-	while (my $href = $sth->fetchrow_hashref()) {
-		push @rc, $href;
+	my $key = $query;
+	if(defined($query_args[0])) {
+		$key .= ' ' . join(', ', @query_args);
+	}
+	my $c;
+	if($c = $self->{cache}) {
+		if(my $rc = $c->get($key)) {
+			return @{$rc};
+		}
 	}
 
-	return \@rc;
+	if(my $sth = $self->{$table}->prepare($query)) {
+		$sth->execute(@query_args) || throw Error::Simple("$query: @query_args");
+
+		my @rc;
+		while(my $href = $sth->fetchrow_hashref()) {
+			push @rc, $href;
+			last if(!wantarray);
+		}
+		if($c && wantarray) {
+			$c->set($key, \@rc, '1 hour');
+		}
+
+		return @rc;
+	}
+	$self->{'logger'}->warn("selectall_hash failure on $query: @query_args");
+	throw Error::Simple("$query: @query_args");
 }
 
 # Returns a hash reference for one row in a table
+# Special argument: table: determines the table to read from if not the default,
+#	which is worked out from the class name
 sub fetchrow_hashref {
 	my $self = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	my $table = ref($self);
+	my $table = $self->{'table'} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{table});
+	$self->_open() if(!$self->{$table});
 
-	my $query = "SELECT * FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+	my $query = 'SELECT * FROM ';
+	if(my $t = delete $params{'table'}) {
+		$query .= $t;
+	} else {
+		$query .= $table;
+	}
+	$query .= " WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
 	my @args;
-	foreach my $c1(keys(%args)) {
+	foreach my $c1(sort keys(%params)) {	# sort so that the key is always the same
 		$query .= " AND $c1 LIKE ?";
-		push @args, $args{$c1};
+		push @args, $params{$c1};
 	}
-	$query .= ' ORDER BY entry';
+	# $query .= ' ORDER BY entry LIMIT 1';
+	$query .= ' LIMIT 1';
 	if($self->{'logger'}) {
-		$self->{'logger'}->debug("fetchrow_hashref $query: " . join(', ', @args));
+		if(defined($args[0])) {
+			$self->{'logger'}->debug("fetchrow_hashref $query: ", join(', ', @args));
+		} else {
+			$self->{'logger'}->debug("fetchrow_hashref $query");
+		}
 	}
-	my $sth = $self->{$table}->prepare($query);
+	my $key = "fetchrow $query " . join(', ', @args);
+	my $c;
+	if($c = $self->{cache}) {
+		if(my $rc = $c->get($key)) {
+			return $rc;
+		}
+	}
+	my $sth = $self->{$table}->prepare($query) or die $self->{$table}->errstr();
 	$sth->execute(@args) || throw Error::Simple("$query: @args");
+	if($c) {
+		my $rc = $sth->fetchrow_hashref();
+		$c->set($key, $rc, '1 hour');
+		return $rc;
+	}
 	return $sth->fetchrow_hashref();
 }
 
 # Execute the given SQL on the data
+# In an array context, returns an array of hash refs, in a scalar context returns a hash of the first row
 sub execute {
 	my $self = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my %args;
 
-	my $table = ref($self);
+	if(ref($_[0]) eq 'HASH') {
+		%args = %{$_[0]};
+	} elsif(ref($_[0])) {
+		Carp::croak('Usage: execute(query => $query)');
+	} elsif(scalar(@_) % 2 == 0) {
+		%args = @_;
+	} else {
+		$args{'query'} = shift;
+	}
+
+	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
-	$self->_open() if(!$self->{table});
+	$self->_open() if(!$self->{$table});
 
 	my $query = $args{'query'};
 	if($self->{'logger'}) {
-		$self->{'logger'}->debug("fetchrow_hashref $query");
+		$self->{'logger'}->debug("execute $query");
 	}
 	my $sth = $self->{$table}->prepare($query);
 	$sth->execute() || throw Error::Simple($query);
 	my @rc;
-	while (my $href = $sth->fetchrow_hashref()) {
+	while(my $href = $sth->fetchrow_hashref()) {
+		return $href if(!wantarray);
 		push @rc, $href;
 	}
 
@@ -275,8 +423,12 @@ sub updated {
 	return $self->{'_updated'};
 }
 
-# Return the contents of an arbiratary column in the database which match the given criteria
-# Returns an array of the matches, or just the first entry when called in scalar context
+# Return the contents of an arbiratary column in the database which match the
+#	given criteria
+# Returns an array of the matches, or just the first entry when called in
+#	scalar context
+
+# Set distinct to 1 if you're after a uniq list
 sub AUTOLOAD {
 	our $AUTOLOAD;
 	my $column = $AUTOLOAD;
@@ -287,24 +439,37 @@ sub AUTOLOAD {
 
 	my $self = shift or return undef;
 
-	my $table = ref($self);
+	my $table = $self->{table} || ref($self);
 	$table =~ s/.*:://;
 
 	$self->_open() if(!$self->{$table});
 
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	my $query = "SELECT DISTINCT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+	my $query;
+	if(wantarray && !delete($params{'distinct'})) {
+		$query = "SELECT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+	} else {
+		$query = "SELECT DISTINCT $column FROM $table WHERE entry IS NOT NULL AND entry NOT LIKE '#%'";
+	}
 	my @args;
 	foreach my $c1(keys(%params)) {
+		if(!defined($params{$c1})) {
+			if($self->{'logger'}) {
+				$self->{'logger'}->debug("AUTOLOAD params $c1 isn't defined");
+			}
+		}
 		# $query .= " AND $c1 LIKE ?";
 		$query .= " AND $c1 = ?";
 		push @args, $params{$c1};
 	}
 	$query .= " ORDER BY $column";
+	if(!wantarray) {
+		$query .= ' LIMIT 1';
+	}
 	if($self->{'logger'}) {
 		if(scalar(@args) && $args[0]) {
-			$self->{'logger'}->debug("AUTOLOAD $query: " . join(', ', @args));
+			$self->{'logger'}->debug("AUTOLOAD $query: ", join(', ', @args));
 		} else {
 			$self->{'logger'}->debug("AUTOLOAD $query");
 		}
@@ -312,7 +477,7 @@ sub AUTOLOAD {
 	my $sth = $self->{$table}->prepare($query) || throw Error::Simple($query);
 	$sth->execute(@args) || throw Error::Simple($query);
 
-	if(wantarray()) {
+	if(wantarray) {
 		return map { $_->[0] } @{$sth->fetchall_arrayref()};
 	}
 	return $sth->fetchrow_array();	# Return the first match only
@@ -325,7 +490,7 @@ sub DESTROY {
 	my $self = shift;
 
 	if($self->{'temp'}) {
-		unlink $self->{'temp'};
+		unlink delete $self->{'temp'};
 	}
 }
 
