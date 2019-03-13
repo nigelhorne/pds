@@ -232,13 +232,11 @@ sub doit
 	my $args = {
 		info => $info,
 		optimise_content => 1,
-		lint_content => 0,
+		lint_content => $info->param('lint_content') // $params{'debug'},
 		logger => $logger,
 		lingua => $lingua
 	};
-	if(!$ENV{'REMOTE_ADDR'}) {
-		$args->{'lint_content'} = 1;
-	}
+
 	if(!$info->is_search_engine() && $config->rootdir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
 		$args->{'save_to'} = {
 			directory => File::Spec->catfile($config->rootdir(), 'save_to'),
