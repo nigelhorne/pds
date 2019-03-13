@@ -80,6 +80,12 @@ sub html {
 			# Create a thumbnail
 			my $im = Image::Magick->new();
 			my $image = File::Spec->catfile($rootdir, 'img', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
+			if(!-r $image) {
+				if(my $logger = $self->{_logger}) {
+					$logger->warn("Can't open $image");
+				}
+				return $self->SUPER::html(updated => $photographs->updated());
+			}
 			$im->read($image);
 			my ($thumb, $x, $y) = Image::Magick::Thumbnail::create($im, 100);
 			# use PNG to try to avoid
