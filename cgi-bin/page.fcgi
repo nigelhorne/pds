@@ -41,6 +41,8 @@ use lib '../lib';
 
 use PDS::Config;
 
+Log::WarnDie->filter(\&filter);
+
 my $info = CGI::Info->new();
 my $tmpdir = $info->tmpdir();
 my $script_dir = $info->script_dir();
@@ -364,4 +366,12 @@ sub choose
 			"/cgi-bin/page.fcgi?page=photographs\n",
 			"/cgi-bin/page.fcgi?page=upload\n";
 	}
+}
+
+sub filter {
+	return 0 if($_[0] =~ /Can't locate Net\/OAuth\/V1_0A\/ProtectedResourceRequest.pm in /);
+	return 0 if($_[0] =~ /Can't locate auto\/NetAddr\/IP\/InetBase\/AF_INET6.al in /);
+	return 0 if($_[0] =~ /S_IFFIFO is not a valid Fcntl macro at /);
+
+	return 1;
 }
