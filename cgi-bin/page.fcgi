@@ -5,11 +5,12 @@
 
 # Based on VWF - https://github.com/nigelhorne/vwf
 
-# use File::HomeDir;
-# use lib File::HomeDir->my_home() . '/lib/perl5';
-
 # Can be tested at the command line, e.g.:
-# rootdir=$(pwd)/.. ./page.fcgi page=index
+#	rootdir=$(pwd)/.. ./page.fcgi page=index
+# To mimic a French mobile site:
+#	rootdir=$(pwd)/.. ./page.fcgi mobile=1 page=index lang=fr
+# To turn off linting of HTML on a search-engine landing page
+#	rootdir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
 
 use strict;
 use warnings;
@@ -20,7 +21,7 @@ no lib '.';
 use Log::Log4perl qw(:levels);	# Put first to cleanup last
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Info;
-use CGI::Lingua;
+use CGI::Lingua 0.61;
 use File::Basename;
 # use CGI::Alert 'you@example.com';
 use FCGI;
@@ -32,6 +33,7 @@ use File::Spec;
 use Log::WarnDie 0.09;
 use CGI::ACL;
 use HTTP::Date;
+use Taint::Runtime qw($TAINT taint_env);
 use autodie qw(:all);
 
 # use lib '/usr/lib';	# This needs to point to the PDS directory lives,
@@ -40,6 +42,9 @@ use autodie qw(:all);
 use lib '../lib';
 
 use PDS::Config;
+
+$TAINT = 1;
+taint_env();
 
 Log::WarnDie->filter(\&filter);
 
@@ -50,6 +55,8 @@ my $config;
 
 my @suffixlist = ('.pl', '.fcgi');
 my $script_name = basename($info->script_name(), @suffixlist);
+
+my $vwflog = File::Spec->catfile($info->logdir(), 'vwf.log');
 
 my $infocache;
 my $linguacache;
@@ -66,6 +73,10 @@ use PDS::Display::sections;
 use PDS::Display::photographs;
 use PDS::Display::upload;
 use PDS::DB::albums;
+if($@) {
+	$logger->error($@);
+	die $@;
+}
 use PDS::DB::sections;
 use PDS::DB::photographs;
 
@@ -104,7 +115,6 @@ sub sig_handler {
 			$buffercache->purge();
 		}
 		CHI->stats->flush();
-		Log::WarnDie->dispatcher(undef);
 		exit(0);
 	}
 }
@@ -114,6 +124,9 @@ $SIG{TERM} = \&sig_handler;
 $SIG{PIPE} = 'IGNORE';
 
 my $request = FCGI::Request();
+
+# It would be really good to send 429 to search engines when there are more than, say, 5 requests being handled.
+# But I don't think that's possible with the FCGI module
 
 while($handling_request = ($request->Accept() >= 0)) {
 	unless($ENV{'REMOTE_ADDR'}) {
@@ -135,7 +148,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 			doit(debug => 1);
 		} catch Error with {
 			my $msg = shift;
-			warn "$msg\n", $msg->stacktrace;
+			warn "$msg\n", $msg->stacktrace();
 			$logger->error($msg);
 		};
 		last;
@@ -152,7 +165,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 		doit(debug => 0);
 	} catch Error with {
 		my $msg = shift;
-		$logger->error($msg);
+		$logger->error("$msg: ", $msg->stacktrace());
 		if($buffercache) {
 			$buffercache->clear();
 		}
@@ -231,15 +244,28 @@ sub doit
 		return;
 	}
 
+	if($vwflog) {
+		open(my $fout, '>>', $vwflog);
+		print $fout
+			'"', $info->domain_name(), '",',
+			'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+			'"', $info->browser_type(), '",',
+			'"', $lingua->language(), '",',
+			'"', $info->as_string(), "\"\n";
+		close($fout);
+	}
+
 	my $args = {
 		info => $info,
 		optimise_content => 1,
-		lint_content => $info->param('lint_content') // $params{'debug'},
 		logger => $logger,
+		lint_content => $info->param('lint_content') // $params{'debug'},
 		lingua => $lingua
 	};
 
-	if(!$info->is_search_engine() && $config->rootdir() && ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
+	if((!$info->is_search_engine()) && $config->rootdir() &&
+	   ($info->param('page') ne 'home') &&
+	   ((!defined($info->param('action'))) || ($info->param('action') ne 'send'))) {
 		$args->{'save_to'} = {
 			directory => File::Spec->catfile($config->rootdir(), 'save_to'),
 			ttl => 3600 * 24,
@@ -301,7 +327,8 @@ sub doit
 			albums => $albums,
 			sections => $sections,
 			photographs => $photographs,
-			cachedir => $cachedir
+			cachedir => $cachedir,
+			databasedir => $database_dir
 		});
 	} elsif($invalidpage) {
 		choose();
@@ -335,7 +362,7 @@ sub doit
 				"Pragma: no-cache\n\n";
 
 			unless($ENV{'REQUEST_METHOD'} && ($ENV{'REQUEST_METHOD'} eq 'HEAD')) {
-				print "There is a problem with your connection. Please contact your ISP. ($error)\n";
+				print "Access Denied\n";
 			}
 		}
 		throw Error::Simple($error ? $error : $info->as_string());
@@ -368,6 +395,7 @@ sub choose
 	}
 }
 
+# False positives we don't need in the logs
 sub filter {
 	return 0 if($_[0] =~ /Can't locate Net\/OAuth\/V1_0A\/ProtectedResourceRequest.pm in /);
 	return 0 if($_[0] =~ /Can't locate auto\/NetAddr\/IP\/InetBase\/AF_INET6.al in /);
