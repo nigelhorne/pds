@@ -22,7 +22,7 @@ jobs:
       - name: Install Dependencies
         run: |
           export PATH=$PATH:/usr/local/Cellar/perl/5.30.0/bin
-          cpanm -iq File::Spec ExtUtils::MakeMaker
+          cpanm -iq File::Spec ExtUtils::MakeMaker App::cpanminus
           cpanm --skip-satisfied -q -n autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo DBD::CSV Text::xSV::Slurp YAML::XS CGI::ACL IPC::System::Simple Taint::Runtime Gzip::Faster
       - name: Run Tests
         run: |
