@@ -27,6 +27,8 @@ jobs:
           cpanm --skip-satisfied -q -n autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo DBD::CSV Text::xSV::Slurp YAML::XS CGI::ACL IPC::System::Simple Taint::Runtime Gzip::Faster
       - name: Run Tests
         run: |
-          cd cgi-bin && perl -c -MO=Lint ./page.fcgi '' && perl -c -Mwarnings::unused ./page.fcgi ''
+          cd cgi-bin
+	  perl -c -MO=Lint ./page.fcgi ''
+	  perl -c -Mwarnings::unused ./page.fcgi ''
           rootdir=$(pwd)/../.. perl page.fcgi page=albums
           rootdir=$(pwd)/../.. perl page.fcgi page=sections section='Stock%20or%20(1,2\)=(select*from(select%20name_const(CHAR(111,108,111,108,111,115,104,101,114\),1\),name_const(CHAR( <-- HERE 111,108,111,108,111,115,104,101,114\),1\)\)a\)%20--%20and%201%3D1'
