@@ -87,8 +87,8 @@ my ($itemtorename,  $newname, $extension, $uploadDest, $newsID);
 my ($itemToRotate,  $degreesToRotate, $uploadFileName, $itemtodelete);
 my ($newsToDelete,  $newsBody, $newsSubject, $prettyalbum, $result);
 my ($newsDate, $previousalbumtemp, $imageCacheSize, $newMaxDimension);
-my ($newPreviewMaxDimension, $newImagesPerRow, $newRowsPerPage);
-my ($logSize, $descriptionToWrite, $previewName,$newSiteFooter,$newSiteHeader, $newAllowPrints, $allowUserTheme);
+my ($newPreviewMaxDimension);
+my ($logSize, $previewName,$newSiteHeader, $newAllowPrints, $allowUserTheme);
 my ($newScaledImageBorderWidth, $newDisplayScaledIcon, $newImageQuality);
 my ($newGuestComments, $newCommentAbuserFilter, $newSiteTitle, $newPathToJpegTran, @FilesToPreview);
     
