@@ -34,18 +34,24 @@ our %blacklist_countries = (
 );
 
 our %blacklist_agents = (
+	'Barkrowler' => 'Barkrowler',
 	'masscan' => 'Masscan',
 	'WBSearchBot' => 'Warebay',
 	'MJ12' => 'Majestic',
 	'Mozilla/4.0 (compatible; Vagabondo/4.0; webcrawler at wise-guys dot nl; http://webagent.wise-guys.nl/; http://www.wise-guys.nl/)' => 'wise-guys',
-	'zgrab' => 'Mozilla/5.0 zgrab/0.x',
-	'iodc' => 'Mozilla/5.0 (compatible; IODC-Odysseus Survey 21796-100-051215155936-107; +https://iodc.co.uk)',
+	'Mozilla/5.0 zgrab/0.x' => 'zgrab',
+	'Mozilla/5.0 (compatible; IODC-Odysseus Survey 21796-100-051215155936-107; +https://iodc.co.uk)' => 'iodc',
+	'Mozilla/5.0 (compatible; adscanner/)' => 'adscanner',
+	'Mozilla/5.0 (compatible; SemrushBot/6~bl; +http://www.semrush.com/bot.html)' => 'SemrushBot',
+	'ZoominfoBot (zoominfobot at zoominfo dot com)' => 'zoominfobot',
 );
 
 our %status;
 
 sub allow {
-	if(!defined($ENV{'REMOTE_ADDR'})) {
+	my $addr = $ENV{'REMOTE_ADDR'};
+
+	if(!defined($addr)) {
 		# Not running as a CGI
 		return 1;
 	}
@@ -53,12 +59,11 @@ sub allow {
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	my $logger = $args{'logger'};
-	my $addr = $ENV{'REMOTE_ADDR'};
 
 	if(defined($status{$addr})) {
 		# Cache the value
 		if($logger) {
-			$logger->debug("$addr: cached value " . $status{$addr});
+			$logger->debug("$addr: cached value ", $status{$addr});
 		}
 		return $status{$addr};
 	}
@@ -67,8 +72,7 @@ sub allow {
 	}
 
 	if($ENV{'HTTP_USER_AGENT'}) {
-		my $blocked = $blacklist_agents{$ENV{'HTTP_USER_AGENT'}};
-		if($blocked) {
+		if(my $blocked = $blacklist_agents{$ENV{'HTTP_USER_AGENT'}}) {
 			if($logger) {
 				$logger->info("$blocked blacklisted");
 			}
@@ -104,10 +108,10 @@ sub allow {
 				}
 			);
 
-			unless($throttler->try_push(key => $ENV{'REMOTE_ADDR'})) {
+			unless($throttler->try_push(key => $addr)) {
+				# Recommend you send HTTP 429 at this point
 				if($logger) {
-					# Recommend you send HTTP 429 at this point
-					$logger->warn("$ENV{REMOTE_ADDR} throttled");
+					$logger->warn("$addr throttled");
 				}
 				$status{$addr} = 0;
 				throw Error::Simple("$addr has been throttled");
@@ -120,20 +124,29 @@ sub allow {
 			unlink($db_file);
 		}
 
-		unless($ENV{'REMOTE_ADDR'} =~ /^192\.168\./) {
+		unless($addr =~ /^192\.168\./) {
 			my $lingua = $args{'lingua'};
-			if(defined($lingua) && $blacklist_countries{uc($lingua->country())}) {
+			if(defined($lingua) && $lingua->country() && $blacklist_countries{uc($lingua->country())}) {
 				if($logger) {
-					$logger->warn("$ENV{REMOTE_ADDR} blocked connexion from ", $lingua->country());
+					$logger->warn("$addr blocked connexion from ", $lingua->country());
 				}
 				$status{$addr} = 0;
-				throw Error::Simple("$ENV{REMOTE_ADDR}: blocked connexion from " . $lingua->country(), 0);
+				throw Error::Simple("$addr: blocked connexion from " . $lingua->country(), 0);
+			}
+			if(($ENV{'HTTP_REFERER'} =~ /^http:\/\/keywords-monitoring-your-success.com\/try.php/) ||
+			   ($ENV{'HTTP_REFERER'} =~ /^http:\/\/www.tcsindustry\.com\//) ||
+			   ($ENV{'HTTP_REFERER'} =~ /^http:\/\/free-video-tool.com\//)) {
+				if($logger) {
+					$logger->warn("$addr: Blocked trawler");
+				}
+				$status{$addr} = 0;
+				throw Error::Simple("$addr: Blocked trawler");
 			}
 		}
 
 		if(defined($ENV{'REQUEST_METHOD'}) && ($ENV{'REQUEST_METHOD'} eq 'GET')) {
 			my $params = $info->params();
-			if(defined($params) && keys(%{$params})) {
+			if(defined($params) && scalar(%{$params})) {
 				require CGI::IDS;
 				CGI::IDS->import();
 
@@ -149,26 +162,19 @@ sub allow {
 			}
 		}
 
-		if(defined($ENV{'HTTP_REFERER'})) {
+		if(my $referer = $ENV{'HTTP_REFERER'}) {
+			$referer =~ tr/ /+/;	# FIXME - this shouldn't be happening
+
 			# Protect against Shellshocker
 			require Data::Validate::URI;
 			Data::Validate::URI->import();
 
-			unless(Data::Validate::URI->new()->is_uri($ENV{'HTTP_REFERER'})) {
+			unless(Data::Validate::URI->new()->is_uri($referer)) {
 				if($logger) {
-					$logger->warn("$ENV{REMOTE_ADDR}: Blocked shellshocker for $ENV{HTTP_REFERER}");
+					$logger->warn("$addr: Blocked shellshocker for $referer");
 				}
 				$status{$addr} = 0;
-				throw Error::Simple("$ENV{REMOTE_ADDR}: Blocked shellshocker for $ENV{HTTP_REFERER}");
-			}
-			if(($ENV{'HTTP_REFERER'} =~ /^http:\/\/keywords-monitoring-your-success.com\/try.php/) ||
-			   ($ENV{'HTTP_REFERER'} =~ /^http:\/\/www.tcsindustry\.com\//) ||
-			   ($ENV{'HTTP_REFERER'} =~ /^http:\/\/free-video-tool.com\//)) {
-				if($logger) {
-					$logger->warn("$ENV{REMOTE_ADDR}: Blocked trawler");
-				}
-				$status{$addr} = 0;
-				throw Error::Simple("$ENV{REMOTE_ADDR}: Blocked trawler");
+				throw Error::Simple("$addr: Blocked shellshocker for $referer");
 			}
 		}
 	}
@@ -208,8 +214,8 @@ sub allow {
 	}
 
 	unless($ips[0]) {
-		require LWP::Simple;
-		LWP::Simple->import();
+		require LWP::Simple::WithCache;
+		LWP::Simple::WithCache->import();
 		require XML::LibXML;
 		XML::LibXML->import();
 
@@ -218,12 +224,12 @@ sub allow {
 		}
 		my $xml;
 		eval {
-			$xml = XML::LibXML->load_xml(string => get('https://secure.dshield.org/api/sources/attacks/100/2012-03-08'));
+			$xml = XML::LibXML->load_xml(string => LWP::Simple::WithCache::get('https://secure.dshield.org/api/sources/attacks/100/2012-03-08'));
 		};
 		unless($@ || !defined($xml)) {
 			foreach my $source ($xml->findnodes('/sources/data')) {
 				my $lastseen = $source->findnodes('./lastseen')->to_literal();
-				next if($readfromcache && ($lastseen ne $today));  # FIXME: Should be today or yesterday to avoid midnight rush
+				next if($readfromcache && ($lastseen ne $today));	# FIXME: Should be today or yesterday to avoid midnight rush
 				my $ip = $source->findnodes('./ip')->to_literal();
 				$ip =~ s/0*(\d+)/$1/g;	# Perl interprets numbers leading with 0 as octal
 				push @ips, $ip;
@@ -239,12 +245,12 @@ sub allow {
 	}
 
 	# FIXME: Doesn't realise 1.2.3.4 is the same as 001.002.003.004
-	if(grep($_ eq $ENV{'REMOTE_ADDR'}, @ips)) {
+	if(grep($_ eq $addr, @ips)) {
 		if($logger) {
-			$logger->warn("Dshield blocked connexion from $ENV{REMOTE_ADDR}");
+			$logger->warn("Dshield blocked connexion from $addr");
 		}
 		$status{$addr} = 0;
-		throw Error::Simple("Dshield blocked connexion from $ENV{REMOTE_ADDR}");
+		throw Error::Simple("Dshield blocked connexion from $addr");
 	}
 
 	if($info->get_cookie(cookie_name => 'mycustomtrackid')) {
@@ -256,7 +262,7 @@ sub allow {
 	}
 
 	if($logger) {
-		$logger->trace("Allowing connexion from $ENV{REMOTE_ADDR}");
+		$logger->trace("Allowing connexion from $addr");
 	}
 
 	$status{$addr} = 1;
