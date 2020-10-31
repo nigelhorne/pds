@@ -133,15 +133,6 @@ sub allow {
 				$status{$addr} = 0;
 				throw Error::Simple("$addr: blocked connexion from " . $lingua->country(), 0);
 			}
-			if(($ENV{'HTTP_REFERER'} =~ /^http:\/\/keywords-monitoring-your-success.com\/try.php/) ||
-			   ($ENV{'HTTP_REFERER'} =~ /^http:\/\/www.tcsindustry\.com\//) ||
-			   ($ENV{'HTTP_REFERER'} =~ /^http:\/\/free-video-tool.com\//)) {
-				if($logger) {
-					$logger->warn("$addr: Blocked trawler");
-				}
-				$status{$addr} = 0;
-				throw Error::Simple("$addr: Blocked trawler");
-			}
 		}
 
 		if(defined($ENV{'REQUEST_METHOD'}) && ($ENV{'REQUEST_METHOD'} eq 'GET')) {
@@ -165,6 +156,15 @@ sub allow {
 		if(my $referer = $ENV{'HTTP_REFERER'}) {
 			$referer =~ tr/ /+/;	# FIXME - this shouldn't be happening
 
+			if(($referer =~ /^http:\/\/keywords-monitoring-your-success.com\/try.php/) ||
+			   ($referer =~ /^http:\/\/www.tcsindustry\.com\//) ||
+			   ($referer =~ /^http:\/\/free-video-tool.com\//)) {
+				if($logger) {
+					$logger->warn("$addr: Blocked trawler");
+				}
+				$status{$addr} = 0;
+				throw Error::Simple("$addr: Blocked trawler");
+			}
 			# Protect against Shellshocker
 			require Data::Validate::URI;
 			Data::Validate::URI->import();

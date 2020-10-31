@@ -5,16 +5,15 @@ package PDS::Display;
 
 use strict;
 use warnings;
-
 use PDS::Config;
 use PDS::Allow;
 use CGI::Info;
-use Error;
-use Fatal qw(:void open);
-
+use File::Spec;
 use Template::Filters;
 use Template::Plugin::EnvHash;
 use HTML::SocialMedia;
+use Error;
+use Fatal qw(:void open);
 
 our $sm;
 our $smcache;
@@ -145,7 +144,7 @@ sub set_cookie {
 }
 
 sub http {
-	my ($self, $params) = @_;
+	my $self = shift;
 
 	# TODO: Only session cookies as the moment
 	my $cookies = $self->{_cookies};
@@ -170,18 +169,19 @@ sub http {
 
 	my $filename = $self->get_template_path();
 	if($filename =~ /\.txt$/) {
-		$rc = "Content-type: text/plain\n";
+		$rc = "Content-Type: text/plain\n";
 	} elsif($language eq 'Japanese') {
 		binmode(STDOUT, ':utf8');
 
-		$rc = "Content-type: text/html; charset=UTF-8\n";
+		$rc = "Content-Type: text/html; charset=UTF-8\n";
 	} elsif($language eq 'Polish') {
 		binmode(STDOUT, ':utf8');
 
-		# print "Content-type: text/html; charset=ISO-8859-2\n";
-		$rc = "Content-type: text/html; charset=UTF-8\n";
+		# print "Content-Type: text/html; charset=ISO-8859-2\n";
+		$rc = "Content-Type: text/html; charset=UTF-8\n";
 	} else {
-		$rc = "Content-type: text/html; charset=ISO-8859-1\n";
+		# $rc = "Content-Type: text/html; charset=ISO-8859-1\n";
+		$rc = "Content-Type: text/html; charset=UTF-8\n";
 	}
 
 	# https://www.owasp.org/index.php/Clickjacking_Defense_Cheat_Sheet
@@ -232,10 +232,14 @@ sub html {
 		$vals->{info} = $info;
 		$vals->{as_string} = $info->as_string();
 
-		$template->process($filename, $vals, \$rc) ||
-			throw Error::Simple($template->error());
+		if(!$template->process($filename, $vals, \$rc)) {
+			if(my $err = $template->error()) {
+                                throw Error::Simple($err);
+                        }
+                        throw Error::Simple("Unknown error in template: $filename");
+                }
 	} elsif($filename =~ /\.(html?|txt)$/) {
-		open(my $fin, '<', $filename);
+		open(my $fin, '<', $filename) || die "$filename: $!";
 
 		my @lines = <$fin>;
 
@@ -314,19 +318,20 @@ sub _pfopen {
 		return $savedpaths->{$candidate};
 	}
 
+	$self->_debug({ message => "_pfopen: path=$path; prefix = $prefix" });
 	foreach my $dir(split(/:/, $path)) {
 		next unless(-d $dir);
 		if($suffixes) {
 			foreach my $suffix(split(/:/, $suffixes)) {
-				$self->_debug({ message => "check for file $dir/$prefix.$suffix" });
-				my $rc = "$dir/$prefix.$suffix";
+				my $rc = File::Spec->catdir($dir, "$prefix.$suffix");
+				$self->_debug({ message => "check for file $rc" });
 				if(-r $rc) {
 					$savedpaths->{$candidate} = $rc;
 					return $rc;
 				}
 			}
 		} elsif(-r "$dir/$prefix") {
-			my $rc = "$dir/$prefix";
+			my $rc = File::Spec->catdir($dir, $prefix);
 			$savedpaths->{$candidate} = $rc;
 			$self->_debug({ message => "using $rc" });
 			return $rc;
@@ -369,10 +374,10 @@ sub _append_browser_type {
 	my $rc;
 
 	if(-d $directory) {
-		if($self->{_info}->is_mobile()) {
-			$rc = "$directory/mobile:";
-		} elsif($self->{_info}->is_search_engine()) {
+		if($self->{_info}->is_search_engine()) {
 			$rc = "$directory/search:$directory/web:$directory/robot:";
+		} elsif($self->{_info}->is_mobile()) {
+			$rc = "$directory/mobile:";
 		} elsif($self->{_info}->is_robot()) {
 			$rc = "$directory/robot:";
 		}
