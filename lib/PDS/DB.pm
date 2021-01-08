@@ -450,7 +450,7 @@ sub fetchrow_hashref {
 		if(defined($query_args[0])) {
 			my @call_details = caller(0);
 			$self->{'logger'}->debug("fetchrow_hashref $query: ", join(', ', @query_args),
-				' called from ', $call_details[2] . ' of ' . $call_details[1]);
+				' called from ', $call_details[2], ' of ', $call_details[1]);
 		} else {
 			$self->{'logger'}->debug("fetchrow_hashref $query");
 		}
@@ -607,6 +607,9 @@ sub DESTROY {
 
 	if($self->{'temp'}) {
 		unlink delete $self->{'temp'};
+	}
+	if(my $table = delete $self->{'table'}) {
+		$table->finish();
 	}
 }
 
