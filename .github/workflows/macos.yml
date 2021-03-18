@@ -21,7 +21,7 @@ jobs:
         run: perl -V
       - name: Install Dependencies
         run: |
-          export PATH=$PATH:/usr/local/Cellar/perl/5.32.0/bin
+          export PATH=$PATH:/usr/local/Cellar/perl/5.32.1_1/bin
           cpan -iT File::Spec ExtUtils::MakeMaker App::cpanminus
           cpanm --skip-satisfied -qin autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo DBD::CSV Text::xSV::Slurp YAML::XS CGI::ACL IPC::System::Simple Taint::Runtime Gzip::Faster Data::Serializer
       - name: Run Tests
