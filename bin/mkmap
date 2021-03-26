@@ -1,0 +1,57 @@
+#!/usr/bin/env perl
+
+use strict;
+use warnings;
+
+my $sitepath="/home/njh/img.nigelhorne.com";
+my $website="https://img.nigelhorne.com";
+
+chdir($sitepath) || die $sitepath;
+
+my @stuff=`find . -type f -name "*.htm" -o -name "*.html" -o -name '*.fcgi' -o -name "*.pl" -o -name "*.php" -o -name "*.pdf"`;
+open(O,">sitemap.xml");
+print O <<EOF;
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.google.com/schemas/sitemap/0.84">
+EOF
+foreach (@stuff) {
+	chomp;
+	my $badone=$_;
+	$badone =~ tr/-_.\/a-zA-Z0-9//cd;
+	print if ($badone ne $_);
+	next if(/_vti_cnf/);
+	next if(/_vti_pvt/);
+	next if(/_borders/);
+	next if(/_derived/);
+	next if(/FormMail.pl/);
+	next if(/ccvalid.pl/);
+	next if(/chkemail.pl/);
+	next if(/^\/bin\//);
+	s/^..//;
+	my $rfile="$sitepath/$_";
+	my ($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$atime,$mtime,$ctime,$blksize,$blocks)=stat $rfile;
+	my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst)=localtime($mtime);
+	$year +=1900;
+	$mon++;
+	# $mod=sprintf("%0.4d-%0.2d-%0.2dT%0.2d:%0.2d:%0.2d+00:00",$year,$mon,$mday,$hour,$min,$sec);
+	my $mod=sprintf("%0.4d-%0.2d-%0.2d",$year,$mon,$mday);
+	my $freq="weekly";
+	$freq="daily" if /index.htm/;
+	my $priority="0.5";
+	$priority="0.7" if /index.htm/;
+	$priority="0.9" if /\/index.htm/;
+
+	print O <<EOF;
+<url>
+      <loc>$website/$_</loc>
+      <lastmod>$mod</lastmod>
+      <changefreq>$freq</changefreq>
+      <priority>$priority</priority>
+</url>
+EOF
+}
+
+print O "</urlset>\n";
+close O;
+unlink("sitemap.xml.gz");
+system('gzip -9v --quiet sitemap.xml');

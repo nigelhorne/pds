@@ -63,6 +63,8 @@ sub html {
 	# find their details
 	# TODO: handle situation where look up fails
 
+	# Note, that you can also use bin/mkthumbs to do this before uploading to the server
+
 	my $albums = $args{'albums'};
 	my $sections = $args{'sections'};
 	my $pics = $photographs->selectall_hashref(\%params);

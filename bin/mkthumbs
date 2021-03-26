@@ -1,0 +1,54 @@
+#!/usr/bin/env perl
+
+# Create the thumbnails.
+# If you don't do this they will be created on the
+#	fly, see lib/PDS/Display/photographs.pm
+
+use warnings;
+use strict;
+use autodie qw(:all);
+use File::Basename;
+use File::Find;
+use File::Spec;
+use Image::Magick;
+use Image::Magick::Thumbnail;
+
+die "Usage: $0 pics_dir thumbs_dir" unless($ARGV[0] && $ARGV[1]);
+
+die "Usage: $0 pics_dir thumbs_dir" unless((-d $ARGV[0]) && (-d $ARGV[1]));
+
+find({ wanted => \&doit, follow => 0, no_chdir => 1 }, $ARGV[0]);
+
+sub doit
+{
+	my $target = $File::Find::name;
+	$target =~ s/^$ARGV[0]//;
+	$target = File::Spec->catfile($ARGV[1], $target);
+
+	if(-d $File::Find::name) {
+		return if(-d $target);
+		print "Making directory $target\n";
+		mkdirp($target);
+		return;
+	}
+	$target =~ s/\.jpe?g$//i;
+	$target =~ s/\.png$//i;
+	$target .= '.png';
+	return if(-f $target);
+	print "Creating thumbnail $target from $File::Find::name\n";
+	my $im = Image::Magick->new();
+	$im->read($File::Find::name);
+	my ($thumb, $x, $y) = Image::Magick::Thumbnail::create($im, 100);
+	# use PNG to try to avoid
+	#	'Warning: No loadimage plugin for "jpeg:cairo"'
+	$thumb->Write($target);
+	chmod 0444, $target;
+}
+
+# https://www.perlmonks.org/?node_id=366292
+sub mkdirp {
+	my $dir = shift;
+	return if (-d $dir);
+	mkdirp(dirname($dir));
+	mkdir($dir);
+}
