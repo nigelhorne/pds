@@ -72,12 +72,12 @@ sub html {
 
 	foreach my $pic(@{$pics}) {
 		my $thumbnail = File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
-		$thumbnail =~ s/\.jpg$/.png/i;
+		$thumbnail =~ s/\.jpe?g$/.png/i;
 		if(!-r $thumbnail) {
 			require Image::Magick::Thumbnail;
 			Image::Magick::Thumbnail->import();
 
-			mkdirp(File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
+			$self->mkdirp(File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
 
 			# Create a thumbnail
 			my $im = Image::Magick->new();
@@ -110,9 +110,14 @@ sub html {
 
 # https://www.perlmonks.org/?node_id=366292
 sub mkdirp {
-	my $dir = shift;
+	my ($self, $dir) = @_;
 	return if (-d $dir);
-	mkdirp(dirname($dir));
+
+	$self->mkdirp(dirname($dir));
+
+	if(my $logger = $self->{_logger}) {
+		$logger->info("Making the directory $dir");
+	}
 	mkdir($dir);
 }
 

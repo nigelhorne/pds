@@ -6,11 +6,11 @@
 # Based on VWF - https://github.com/nigelhorne/vwf
 
 # Can be tested at the command line, e.g.:
-#	rootdir=$(pwd)/.. ./page.fcgi page=index
+#	rootdir=$(pwd)/.. ./page.fcgi page=albums
 # To mimic a French mobile site:
-#	rootdir=$(pwd)/.. ./page.fcgi mobile=1 page=index lang=fr
+#	rootdir=$(pwd)/.. ./page.fcgi mobile=1 page=albums lang=fr
 # To turn off linting of HTML on a search-engine landing page
-#	rootdir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
+#	rootdir=$(pwd)/.. ./page.fcgi search=1 page=photographs entry=A1 section=S1 lint_content=0
 
 use strict;
 use warnings;

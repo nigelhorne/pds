@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 
 # Create the thumbnails.
+#	e.g. ./mkthumbs ../img ../thumbs
+
 # If you don't do this they will be created on the
 #	fly, see lib/PDS/Display/photographs.pm
 
@@ -15,7 +17,7 @@ use Image::Magick::Thumbnail;
 
 die "Usage: $0 pics_dir thumbs_dir" unless($ARGV[0] && $ARGV[1]);
 
-die "Usage: $0 pics_dir thumbs_dir" unless((-d $ARGV[0]) && (-d $ARGV[1]));
+die "$0: either $ARGV[0] or $ARGV[1] isn't a directory" unless((-d $ARGV[0]) && (-d $ARGV[1]));
 
 find({ wanted => \&doit, follow => 0, no_chdir => 1 }, $ARGV[0]);
 
