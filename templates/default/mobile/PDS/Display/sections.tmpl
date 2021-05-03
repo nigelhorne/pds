@@ -31,7 +31,10 @@
 					<h1>[% album.title %] is empty</h1>
 					Please choose a different <a href="?page=albums">album</a>.<br><br>
 				[% END %]
-				[ <a href="?page=albums">Home</a> ]
+				<font size="+2">
+                                        [ <a href="?page=albums">Home</a> ]<br>
+                                        [ <a href="?page=sections&entry=[% album.entry %]">[% album.title %]</a><br>
+                                </font>
 			</center>
 		[% ELSE %]
 			TODO - reload the album list
