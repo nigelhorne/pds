@@ -96,7 +96,7 @@ sub html {
 			chmod 0444, $thumbnail;
 		}
 		$thumbnail = '/thumbs/' . $pic->{'entry'} . '/' . $pic->{'section'} . '/' . $pic->{'file'};
-		$thumbnail =~ s/\.jpg$/.png/i;
+		$thumbnail =~ s/\.jpe?g$/.png/i;
 		$pic->{'thumbnail'} = $thumbnail;
 	}
 
