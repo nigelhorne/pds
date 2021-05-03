@@ -27,11 +27,11 @@
 					[% FOREACH section IN sections %]
 						<a href="?page=photographs&entry=[% album.entry %]&section=[% section.section %] class="myButton"">[% section.title %]</a><br><br>
 					[% END %]
-					[ <a href="?page=albums">Home</a> ]
 				[% ELSE %]
 					<h1>[% album.title %] is empty</h1>
-					Please choose a different <a href="?page=albums">album</a>.
+					Please choose a different <a href="?page=albums">album</a>.<br><br>
 				[% END %]
+				[ <a href="?page=albums">Home</a> ]
 			</center>
 		[% ELSE %]
 			TODO - reload the album list
