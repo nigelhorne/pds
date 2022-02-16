@@ -24,6 +24,16 @@ sub new {
 
 	my $class = ref($proto) || $proto;
 
+	if(defined($ENV{'HTTP_REFERER'})) {
+		# Protect against Shellshocker
+		require Data::Validate::URI;
+		Data::Validate::URI->import();
+
+		unless(Data::Validate::URI->new()->is_uri($ENV{'HTTP_REFERER'})) {
+			return 0;
+		}
+	}
+
 	my $info = $args{info} || CGI::Info->new();
 	my $config = $args{config} || PDS::Config->new({ logger => $args{logger}, info => $info, lingua => $args{lingua} });
 
@@ -207,7 +217,7 @@ sub html {
 
 		my $info = $self->{_info};
 
-		# The values in config are defaults which can be overriden by
+		# The values in config are defaults which can be overridden by
 		# the values in info, then the values in params
 		my $vals;
 		if(defined($self->{_config})) {
@@ -353,7 +363,7 @@ sub _debug {
 }
 
 sub obfuscate {
-	map { '&#' . ord($_) . ';' } split(//, shift);
+	return map { '&#' . ord($_) . ';' } split(//, shift);
 }
 
 sub _append_browser_type {
