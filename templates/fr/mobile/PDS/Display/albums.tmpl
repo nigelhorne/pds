@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
+    "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en" dir="ltr">
+	<head>
+		<title>[% SiteTitle.join(' ') %]</title>
+		<meta http-equiv="Content-Language" content="fr">
+		<link rel="stylesheet" href="/css/mobile.css" type="text/css" media="screen">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf8">
+		[% IF twitter %]
+			<meta name="twitter:site" content="@[% twitter %]">
+			<meta name="twitter:title" content="@[% SiteTitle %]">
+		[% END %]
+		<meta name="description" content="[% SiteTitle.join(' ') %] - A PDS webpage">
+		<meta name="Copyright" content="Copyright (C) 2021 Nigel Horne">
+	</head>
+	<body>
+		<h1>[% SiteTitle.join(' ') %]</h1>
+		[% IF error %]
+			<p><font color="red" size="+2">[% error %]</font></p>
+		[% END %]
+		<center>
+			<h2>Choose an Album</h2>
+			[% FOREACH album IN albums %]
+				<a href="?page=sections&entry=[% album.entry %]" class="myButton">[% album.title %]</a><br><br>
+			[% END %]
+		</center>
+		<p><i>
+			Cette site web a &eactue;t&eacute; cr&eacute;&eacute; par <a href="//github.com/nigelhorne/pds">Photography Display System</a>.<br>
+			[% IF updated %]
+				[% USE date %]
+				Last album added on [% date.format(time = updated, format = '%d %b %Y', locale = lingua.language_code_alpha2) %]
+			[% END %]
+		</i></p>
+	</body>
+</html>
