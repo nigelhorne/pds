@@ -11,8 +11,8 @@
 			<meta name="twitter:site" content="@[% twitter %]">
 			<meta name="twitter:title" content="@[% SiteTitle %]">
 		[% END %]
-		<meta name="description" content="[% SiteTitle.join(' ') %] - A PDS webpage">
-		<meta name="Copyright" content="Copyright (C) 2021 Nigel Horne">
+		<meta name="description" content="[% SiteTitle.join(' ') %] - Un PDS webpage">
+		<meta name="Copyright" content="Copyright (C) 2023 Nigel Horne">
 	</head>
 	<body>
 		<h1>[% SiteTitle.join(' ') %]</h1>
@@ -20,7 +20,7 @@
 			<p><font color="red" size="+2">[% error %]</font></p>
 		[% END %]
 		<center>
-			<h2>Choose an Album</h2>
+			<h2>Choisissez an Album</h2>
 			[% FOREACH album IN albums %]
 				<a href="?page=sections&entry=[% album.entry %]" class="myButton">[% album.title %]</a><br><br>
 			[% END %]
