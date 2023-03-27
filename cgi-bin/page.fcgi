@@ -92,6 +92,7 @@ PDS::DB::init({ directory => $database_dir, logger => $logger });
 my $albums = PDS::DB::albums->new();
 if($@) {
 	$logger->error($@);
+	Log::WarnDie->dispatcher(undef);
 	die $@;
 }
 my $sections = PDS::DB::sections->new();
