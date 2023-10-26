@@ -148,14 +148,13 @@ sub create_memory_cache {
 		if(my $size = ($args{'size'} || $config->{'memory_cache'}->{'size'})) {
 			$chi_args{'max_size'} = $chi_args{'size'} = $size;
 		}
-	} elsif(($driver ne 'Null') && ($driver ne 'Memory') && ($driver ne 'SharedMem')) {
+	} elsif(($driver ne 'Null') && ($driver ne 'Memory')) {
 		$chi_args{'root_dir'} = $args{'root_dir'} || $config->{memory_cache}->{root_dir};
 		throw Error::Simple('root_dir is not optional') unless($chi_args{'root_dir'});
 		if($logger) {
 			$logger->debug("root_dir: $chi_args{root_dir}");
 		}
-	}
-	if($driver eq 'Redis') {
+	} elsif($driver eq 'Redis') {
 		my %redis_options = (
 			reconnect => 60,
 			every => 1_000_000
