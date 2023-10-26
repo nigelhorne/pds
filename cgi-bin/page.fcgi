@@ -87,7 +87,12 @@ use PDS::DB::sections;
 use PDS::DB::photographs;
 
 my $database_dir = "$script_dir/../databases";
-PDS::DB::init({ directory => $database_dir, logger => $logger });
+Ged2site::DB::init({
+	cache => CHI->new(driver => 'Memory', datastore => {}),
+	cache_duration => '1 day',
+	directory => $database_dir,
+	logger => $logger
+});
 
 my $albums = PDS::DB::albums->new();
 if($@) {
