@@ -15,7 +15,7 @@ use File::Spec;
 use Image::Magick;
 use Image::Magick::Thumbnail;
 
-die "Usage: $0 pics_dir thumbs_dir" unless($ARGV[0] && $ARGV[1]);
+die "Usage: $0 img_dir thumbs_dir" unless($ARGV[0] && $ARGV[1]);
 
 die "$0: either $ARGV[0] or $ARGV[1] isn't a directory" unless((-d $ARGV[0]) && (-d $ARGV[1]));
 
