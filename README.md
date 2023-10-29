@@ -55,6 +55,15 @@ The configuration file can be in any number of formats including INI and XML.
     disc_cache: where long-term information is stored, such as copies of output to see if HTTP 304 can be returned
     contact: your name and e-mail address
 
+# Adding a photograph
+
+To upload, store picture in img/A?/S? (e.g. img/A4/S2/tulip.jpg)
+Run "bin/mkthumbs img/A4/S2 thumbs/A4/S2"
+Edit the following files in the databases directory:
+* albumbs.csv
+* sections.csv
+* photographs.csv
+
 # Acknowledgements
 
 So many Perl CPAN modules that if I list them all I'll miss one.
@@ -69,7 +78,7 @@ Magnific Popup http://dimsemenov.com/plugins/magnific-popup/
 
 # LICENSE AND COPYRIGHT
 
-Copyright 2017 Nigel Horne.
+Copyright 2017-2023 Nigel Horne.
 
 This program is released under the following licence: GPL2 for personal use on
 a single computer.
