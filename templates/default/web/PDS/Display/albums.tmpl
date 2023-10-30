@@ -23,7 +23,7 @@
 			<h2>Choose an album</h2>
 			<ol>
 				[% FOREACH album IN albums %]
-					<li><a href="?page=sections&entry=[% album.entry %]">[% album.title %]</a></li>
+					<li><a href="?page=sections&amp;entry=[% album.entry %]">[% album.title %]</a></li>
 				[% END %]
 			</ol>
 		</div>
