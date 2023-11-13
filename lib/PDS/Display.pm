@@ -14,6 +14,7 @@ use Template::Plugin::EnvHash;
 use HTML::SocialMedia;
 use Error;
 use Fatal qw(:void open);
+use File::pfopen;
 
 our $sm;
 our $smcache;
@@ -75,7 +76,7 @@ sub new {
 		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
 	}
 	$self->{'_social_media'}->{'facebook_share_button'} = $sm->as_string(facebook_share_button => 1);
-	$self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
+	# $self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
 
 	return bless $self, $class;
 }
@@ -135,10 +136,11 @@ sub get_template_path {
 	my $modulepath = $args{'modulepath'} || ref($self);
 	$modulepath =~ s/::/\//g;
 
-	my $filename = $self->_pfopen($prefix, $modulepath, 'tmpl:tt:html:htm:txt');
-	if((!defined($filename)) || (!-f $filename) || (!-r $filename)) {
+	my ($fh, $filename) = File::pfopen::pfopen($prefix, $modulepath, 'tmpl:tt:html:htm:txt');
+	if((!defined($filename)) || (!defined($fh))) {
 		throw Error::Simple("Can't find suitable $modulepath html or tmpl file in $prefix in $dir or a subdir");
 	}
+	close($fh);
 	$self->_debug({ message => "using $filename" });
 	$self->{_filename} = $filename;
 	return $filename;
@@ -307,48 +309,6 @@ sub as_string {
 	return $rc . $self->html($args);
 }
 
-# my $f = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo', 'txt:bin' );
-# $f = pfopen('/tmp:/var/tmp:/home/njh/tmp', 'foo');
-sub _pfopen {
-	my $self = shift;
-	my $path = shift;
-	my $prefix = shift;
-	my $suffixes = shift;
-
-	our $savedpaths;
-
-	my $candidate;
-	if(defined($suffixes)) {
-		$candidate = "$prefix;$path;$suffixes";
-	} else {
-		$candidate = "$prefix;$path";
-	}
-	if($savedpaths->{$candidate}) {
-		$self->_debug({ message => "remembered $savedpaths->{$candidate}" });
-		return $savedpaths->{$candidate};
-	}
-
-	$self->_debug({ message => "_pfopen: path=$path; prefix = $prefix" });
-	foreach my $dir(split(/:/, $path)) {
-		next unless(-d $dir);
-		if($suffixes) {
-			foreach my $suffix(split(/:/, $suffixes)) {
-				my $rc = File::Spec->catdir($dir, "$prefix.$suffix");
-				$self->_debug({ message => "check for file $rc" });
-				if(-r $rc) {
-					$savedpaths->{$candidate} = $rc;
-					return $rc;
-				}
-			}
-		} elsif(-r "$dir/$prefix") {
-			my $rc = File::Spec->catdir($dir, $prefix);
-			$savedpaths->{$candidate} = $rc;
-			$self->_debug({ message => "using $rc" });
-			return $rc;
-		}
-	}
-}
-
 sub _debug {
 	my $self = shift;
 
@@ -385,11 +345,11 @@ sub _append_browser_type {
 
 	if(-d $directory) {
 		if($self->{_info}->is_search_engine()) {
-			$rc = "$directory/search:$directory/web:$directory/robot:";
+			$rc = "$directory/search:$directory/robot:";
 		} elsif($self->{_info}->is_mobile()) {
 			$rc = "$directory/mobile:";
 		} elsif($self->{_info}->is_robot()) {
-			$rc = "$directory/robot:";
+			$rc = "$directory/robot:$directory/search:";
 		}
 		$rc .= "$directory/web:";
 
@@ -398,7 +358,6 @@ sub _append_browser_type {
 	}
 
 	return '';	# Don't return undef or else the caller may use an uninit variable
-
 }
 
 1;
