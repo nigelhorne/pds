@@ -1,4 +1,7 @@
 ---
+# See https://github.com/actions/virtual-environments
+# https://github.com/marketplace/actions/setup-perl-environment
+
 name: linux
 
 on:
@@ -8,23 +11,18 @@ on:
     tags-ignore:
       - '*'
   pull_request:
-
 jobs:
   perl:
-
     runs-on: ubuntu-latest
-
     strategy:
+      fail-fast: false
       matrix:
         perl-version:
-          # - '5.16'
           - '5.22'
           - '5.32'
           - 'latest'
-
     container:
       image: perl:${{ matrix.perl-version }}
-
     steps:
       - uses: actions/checkout@v4
       - name: perl -V
