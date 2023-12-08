@@ -3,7 +3,6 @@
 # https://github.com/marketplace/actions/setup-perl-environment
 
 name: linux
-
 on:
   push:
     branches:
@@ -11,6 +10,8 @@ on:
     tags-ignore:
       - '*'
   pull_request:
+  schedule:
+    - cron: '13 23 9 * *'
 jobs:
   perl:
     runs-on: ubuntu-latest
@@ -18,8 +19,7 @@ jobs:
       fail-fast: false
       matrix:
         perl-version:
-          - '5.22'
-          - '5.32'
+          - '5.36'
           - 'latest'
     container:
       image: perl:${{ matrix.perl-version }}
