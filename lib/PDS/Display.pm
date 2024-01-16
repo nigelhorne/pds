@@ -281,6 +281,8 @@ sub html {
 	return $rc;
 }
 
+# Call this to display the page
+# It calls http() to create the HTTP headers, then html() to create the body
 sub as_string {
 	my ($self, $args) = @_;
 
