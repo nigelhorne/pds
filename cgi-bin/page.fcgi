@@ -251,7 +251,9 @@ sub doit
 	if($vwflog && open(my $fout, '>>', $vwflog)) {
 		print $fout
 			'"', $info->domain_name(), '",',
+			'"', strftime('%F %T', localtime), '",',
 			'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
+			'"', $lingua->country(), '",',
 			'"', $info->browser_type(), '",',
 			'"', $lingua->language(), '",',
 			'"', $info->as_string(), "\"\n";
