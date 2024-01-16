@@ -68,20 +68,20 @@ sub html {
 	my $albums = $args{'albums'};
 	my $sections = $args{'sections'};
 	my $pics = $photographs->selectall_hashref(\%params);
-	my $rootdir = $self->{_config}->{rootdir} || $self->{_info}->rootdir();
+	my $root_dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
 
 	foreach my $pic(@{$pics}) {
-		my $thumbnail = File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
+		my $thumbnail = File::Spec->catfile($root_dir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
 		$thumbnail =~ s/\.jpe?g$/.png/i;
 		if(!-r $thumbnail) {
 			require Image::Magick::Thumbnail;
 			Image::Magick::Thumbnail->import();
 
-			$self->mkdirp(File::Spec->catfile($rootdir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
+			$self->mkdirp(File::Spec->catfile($root_dir, 'thumbs', $pic->{'entry'}, $pic->{'section'}));
 
 			# Create a thumbnail
 			my $im = Image::Magick->new();
-			my $image = File::Spec->catfile($rootdir, 'img', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
+			my $image = File::Spec->catfile($root_dir, 'img', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
 			if(!-r $image) {
 				if(my $logger = $self->{_logger}) {
 					$logger->warn("Can't open $image");

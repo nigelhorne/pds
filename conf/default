@@ -1,4 +1,4 @@
-# rootdir: /home/you/imgsite.com
+# root_dir: /home/you/imgsite.com
 SiteTitle: Test Picture Site
 # memory_cache: driver=File, root_dir=/tmp/cache
 memory_cache: driver=Null
