@@ -153,13 +153,16 @@ sub get_template_path {
 	return $filename;
 }
 
-sub set_cookie {
+sub set_cookie
+{
 	my $self = shift;
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	foreach my $key(keys(%params)) {
 		$self->{_cookies}->{$key} = $params{$key};
 	}
+
+	return $self;
 }
 
 sub http {
@@ -316,7 +319,8 @@ sub as_string {
 	return $rc . $self->html($args);
 }
 
-sub _debug {
+sub _debug
+{
 	my $self = shift;
 
 	if($self->{_logger}) {
@@ -327,6 +331,7 @@ sub _debug {
 			$self->{_logger}->debug($params{'message'});
 		}
 	}
+	return $self;
 }
 
 sub obfuscate {
@@ -348,8 +353,8 @@ sub _append_browser_type {
 	if($self->{_logger}) {
 		$self->{_logger}->debug("_append_browser_type: directory = $directory");
 	}
-	my $rc;
 
+	my $rc;
 	if(-d $directory) {
 		if($self->{_info}->is_search_engine()) {
 			$rc = "$directory/search:$directory/robot:";
