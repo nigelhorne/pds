@@ -2,8 +2,8 @@ package PDS::DB::albums;
 
 # The database associated with the albums
 
-use PDS::DB;
+use Database::Abstraction;
 
-our @ISA = ('PDS::DB');
+our @ISA = ('Database::Abstraction');
 
 1;

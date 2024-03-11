@@ -2,8 +2,8 @@ package PDS::DB::photographs;
 
 # The database associated with the photographs
 
-use PDS::DB;
+use Database::Abstraction;
 
-our @ISA = ('PDS::DB');
+our @ISA = ('Database::Abstraction');
 
 1;

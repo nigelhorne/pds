@@ -87,7 +87,7 @@ use PDS::DB::sections;
 use PDS::DB::photographs;
 
 my $database_dir = "$script_dir/../databases";
-PDS::DB::init({
+Database::Abstraction::init({
 	cache => CHI->new(driver => 'Memory', datastore => {}),
 	cache_duration => '1 day',
 	directory => $database_dir,
