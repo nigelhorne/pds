@@ -11,6 +11,7 @@ use Data::Dumper;
 use DBI;
 use Error;
 use Log::Any::Adapter;
+use Posix;
 
 BEGIN {
 	Log::Any::Adapter->set('Log4perl');
