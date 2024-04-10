@@ -11,7 +11,6 @@ use Data::Dumper;
 use DBI;
 use Error;
 use Log::Any::Adapter;
-use POSIX;
 
 BEGIN {
 	Log::Any::Adapter->set('Log4perl');
@@ -46,10 +45,11 @@ sub create_disc_cache {
 		namespace => $args{'namespace'}
 	);
 
-	if($logger) {
-		$chi_args{'on_set_error'} = 'log';
-		$chi_args{'on_get_error'} = 'log';
-	}
+	# Don't do this because it takes a lot of complex configuration
+	# if($logger) {
+		# $chi_args{'on_set_error'} = 'log';
+		# $chi_args{'on_get_error'} = 'log';
+	# }
 
 	if($config->{disc_cache}->{server}) {
 		my @servers;
@@ -70,13 +70,13 @@ sub create_disc_cache {
 		$chi_args{'servers'} = \@servers;
 	} elsif($driver eq 'DBI') {
 		# Use the cache connection details in the configuration file
-                $chi_args{'dbh'} = DBI->connect($config->{disc_cache}->{connect});
-                if(!defined($chi_args{'dbh'})) {
-                        if($logger) {
-                                $logger->error($DBI::errstr);
-                        }
-                        throw Error::Simple($DBI::errstr);
-                }
+		$chi_args{'dbh'} = DBI->connect($config->{disc_cache}->{connect});
+		if(!defined($chi_args{'dbh'})) {
+			if($logger) {
+				$logger->error($DBI::errstr);
+			}
+			throw Error::Simple($DBI::errstr);
+		}
 		$chi_args{'create_table'} = 1;
 	} elsif($driver eq 'Redis') {
 		my %redis_options = (
