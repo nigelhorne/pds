@@ -152,7 +152,7 @@ sub create_memory_cache {
 			$chi_args{'max_size'} = $max_size;
 		}
 	} elsif(($driver ne 'Null') && ($driver ne 'Memory')) {
-		$chi_args{'root_dir'} = $args{'root_dir'} || $config->{memory_cache}->{root_dir};
+		$chi_args{'root_dir'} = $args{'root_dir'} || $config->{memory_cache}->{root_dir} || $config->{'root_dir'};
 		throw Error::Simple('root_dir is not optional') unless($chi_args{'root_dir'});
 		if($logger) {
 			$logger->debug("root_dir: $chi_args{root_dir}");
