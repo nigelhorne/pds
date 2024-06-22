@@ -103,6 +103,7 @@ If the arguments are not set, tries to take from class level defaults
 =cut
 
 sub new {
+	die 'do not use';
 	my $proto = shift;
 	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
