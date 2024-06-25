@@ -33,7 +33,8 @@ use File::Spec;
 use Log::WarnDie 0.09;
 use CGI::ACL;
 use HTTP::Date;
-use Taint::Runtime qw($TAINT taint_env);
+use POSIX qw(strftime);
+# use Taint::Runtime qw($TAINT taint_env);
 use autodie qw(:all);
 
 # use lib '/usr/lib';	# This needs to point to the PDS directory lives,
