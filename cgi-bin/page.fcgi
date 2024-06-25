@@ -44,8 +44,8 @@ use lib '../lib';
 
 use PDS::Config;
 
-$TAINT = 1;
-taint_env();
+# $TAINT = 1;
+# taint_env();
 
 Log::WarnDie->filter(\&filter);
 
