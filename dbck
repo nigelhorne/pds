@@ -1,0 +1,46 @@
+#!/usr/bin/env perl
+
+# Verify the database consistency by checking each file exists
+
+use strict;
+use warnings;
+use Data::Dumper;
+use File::Spec;
+
+use lib '../lib';
+
+use PDS::DB::albums;
+if($@) {
+	die $@;
+}
+use PDS::DB::sections;
+use PDS::DB::photographs;
+
+Database::Abstraction::init({
+	directory => File::Spec->rel2abs('../databases')
+});
+
+my $albums = PDS::DB::albums->new();
+if($@) {
+	die $@;
+}
+my $sections = PDS::DB::sections->new();
+my $photographs = PDS::DB::photographs->new();
+my $rc = 0;
+
+my @a = $albums->entry();
+foreach my $album(@a) {
+	my @s = $sections->section($album);
+	foreach my $section(@s) {
+		my @p = $photographs->selectall_hash({ entry => $album, section => $section });
+		foreach my $photograph(@p) {
+			my $file = File::Spec->catfile('../img', $album, $section, $photograph->{'file'});
+			if(!-e $file) {
+				print STDERR "Can't find $file\n";
+				$rc = 1;
+			}
+		}
+	}
+}
+
+exit($rc);
