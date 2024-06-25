@@ -84,7 +84,7 @@ sub html {
 			my $image = File::Spec->catfile($root_dir, 'img', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
 			if(!-r $image) {
 				if(my $logger = $self->{_logger}) {
-					$logger->warn("Can't open $image");
+					$logger->err("Can't open $image");
 				}
 				return $self->SUPER::html(updated => $photographs->updated());
 			}
