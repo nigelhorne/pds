@@ -285,7 +285,7 @@ sub appendLogFile {
 	my($oldContents);
 
 	if (-e $fileToOpen) {
-		open (LOG, $fileToOpen) || bail ("can't open $fileToOpen: ($!)");;
+		open (LOG, $fileToOpen) || bail ("can't open $fileToOpen: ($!)");
 		$oldContents = (join '', <LOG>);
 		close (LOG) || bail ("can't close $fileToOpen: ($!)");
 	}
