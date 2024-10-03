@@ -79,6 +79,8 @@ use PDS::Display::albums;
 use PDS::Display::sections;
 use PDS::Display::photographs;
 use PDS::Display::upload;
+use PDS::Display::meta_data;
+
 use PDS::DB::albums;
 if($@) {
 	$logger->error($@);
@@ -319,6 +321,8 @@ sub doit
 	eval {
 		my $page = $info->param('page');
 		$page =~ s/#.*$//;
+		# $display = PDS::Display::$page->new($args);
+
 		if($page eq 'albums') {
 			$display = PDS::Display::albums->new($args);
 		} elsif($page eq 'sections') {
@@ -327,6 +331,8 @@ sub doit
 			$display = PDS::Display::photographs->new($args);
 		} elsif($page eq 'upload') {
 			$display = PDS::Display::upload->new($args);
+		} elsif($page eq 'meta-data') {
+			$display = PDS::Display::meta_data->new($args);
 		} else {
 			$logger->info("Unknown page $page");
 			$invalidpage = 1;
@@ -342,10 +348,10 @@ sub doit
 	if(defined($display)) {
 		# Pass in handles to the databases
 		print $display->as_string({
+			cachedir => $cachedir,
 			albums => $albums,
 			sections => $sections,
 			photographs => $photographs,
-			cachedir => $cachedir,
 			databasedir => $database_dir
 		});
 	} elsif($invalidpage) {
@@ -392,7 +398,17 @@ sub choose
 {
 	$logger->info('Called with no page to display');
 
-	return unless($info->status() == 200);
+	my $status = $info->status();
+
+	if($status != 200) {
+		require HTTP::Status;
+		HTTP::Status->import();
+
+		print "Status: $status ",
+			HTTP::Status::status_message($status),
+			"\n\n";
+		return;
+	}
 
 	print "Status: 300 Multiple Choices\n",
 		"Content-type: text/plain\n";
@@ -410,7 +426,8 @@ sub choose
 		print "/cgi-bin/page.fcgi?page=albums\n",
 			"/cgi-bin/page.fcgi?page=sections\n",
 			"/cgi-bin/page.fcgi?page=photographs\n",
-			"/cgi-bin/page.fcgi?page=upload\n";
+			"/cgi-bin/page.fcgi?page=upload\n",
+			"/cgi-bin/page.fcgi?page=meta-data\n";
 	}
 }
 
