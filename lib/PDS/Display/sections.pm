@@ -6,8 +6,12 @@ our @ISA = ('PDS::Display');
 
 sub html {
 	my $self = shift;
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
+	if(my $logger = $self->{_logger}) {
+		$logger->trace('Entering ' . __PACKAGE__ . ' html()');
+	}
+
+	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 	my $info = $self->{_info};
 	my $allowed = {
 		'page' => 'sections',
@@ -23,6 +27,9 @@ sub html {
 
 	unless(scalar(keys %params)) {
 		# No album chosen, list them all
+		if(my $logger = $self->{_logger}) {
+			$logger->debug('album not defined');
+		}
 		return $self->SUPER::html({ updated => $sections->updated() });
 	}
 
