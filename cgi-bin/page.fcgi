@@ -364,10 +364,11 @@ sub doit
 		# Pass in handles to the databases
 		print $display->as_string({
 			cachedir => $cachedir,
+			databasedir => $database_dir,
+			database_dir => $database_dir,
 			albums => $albums,
 			sections => $sections,
 			photographs => $photographs,
-			databasedir => $database_dir
 		});
 		if($vwflog && open(my $fout, '>>', $vwflog)) {
 			print $fout
