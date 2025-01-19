@@ -7,6 +7,10 @@ package PDS::Allow;
 # PDS is licensed under GPL2.0 for personal use only
 # njh@bandsman.co.uk
 
+# Decide if we're going to allow this client to view the website
+# Usage:
+#	unless(PDS::Allow::allow({info => $info, lingua => $lingua})) {
+
 use strict;
 use warnings;
 use File::Spec;
@@ -15,29 +19,16 @@ use Error;
 
 use constant DSHIELD => 'https://secure.dshield.org/api/sources/attacks/100/2012-03-08';
 
-our %blacklist_countries = (
-	'BY' => 1,
-	'MD' => 1,
-	'RU' => 1,
-	'CN' => 1,
-	'BR' => 1,
-	'UY' => 1,
-	'TR' => 1,
-	'MA' => 1,
-	'VE' => 1,
-	'SA' => 1,
-	'CY' => 1,
-	'CO' => 1,
-	'MX' => 1,
-	'IN' => 1,
-	'RS' => 1,
-	'PK' => 1,
-	'UA' => 1,
+# TODO: Remove code duplicated with CGI::Allow
+# Blacklist of country codes (hardcoded for now)
+my %blacklist = map { $_ => 1 } qw(
+	BG BR CN CO CY IN IR KR LT MA MD MX PK RS RU SA TR TW UY VE VN ZA
 );
 
 our %blacklist_agents = (
 	'Barkrowler' => 'Barkrowler',
 	'masscan' => 'Masscan',
+	'python-requests/2.27.1' => 'python-requests/2.27.1',
 	'WBSearchBot' => 'Warebay',
 	'MJ12' => 'Majestic',
 	'Mozilla/4.0 (compatible; Vagabondo/4.0; webcrawler at wise-guys dot nl; http://webagent.wise-guys.nl/; http://www.wise-guys.nl/)' => 'wise-guys',
@@ -113,7 +104,7 @@ sub allow {
 			unless($throttler->try_push(key => $addr)) {
 				# Recommend you send HTTP 429 at this point
 				if($logger) {
-					$logger->warn("$addr throttled");
+					$logger->warn("$addr has been throttled");
 				}
 				$status{$addr} = 0;
 				throw Error::Simple("$addr has been throttled");
@@ -126,13 +117,14 @@ sub allow {
 			unlink($db_file);
 		}
 
-		unless($addr =~ /^192\.168\./) {
+		unless(($addr =~ /^192\.168\./) || $info->baidu()) {
 			my $lingua = $args{'lingua'};
 			if(defined($lingua) && $lingua->country() && $blacklist_countries{uc($lingua->country())}) {
 				if($logger) {
 					$logger->warn("$addr blocked connexion from ", $lingua->country());
 				}
 				$status{$addr} = 0;
+				$info->status(403);
 				throw Error::Simple("$addr: blocked connexion from " . $lingua->country(), 0);
 			}
 		}
@@ -145,12 +137,28 @@ sub allow {
 
 				my $ids = CGI::IDS->new();
 				$ids->set_scan_keys(scan_keys => 1);
-				if($ids->detect_attacks(request => $params) > 0) {
+				my $impact = $ids->detect_attacks(request => $params);
+				if($impact > 0) {
 					if($logger) {
-						$logger->warn("$addr: IDS blocked connexion for ", $info->as_string());
+						$logger->warn("$addr: IDS blocked connexion for ", $info->as_string(), " impact = $impact");
+						$logger->warn(Data::Dumper->new([$ids->get_attacks()]));
 					}
-					$status{$addr} = 0;
-					throw Error::Simple("$addr: IDS blocked connexion for " . $info->as_string());
+					if($impact > 30) {
+						$status{$addr} = 0;
+						$info->status(403);
+						throw Error::Simple("$addr: IDS blocked connexion for " . $info->as_string());
+					}
+				}
+
+				foreach my $v (values %{$params}) {
+					if($v eq '/etc/passwd') {
+						if($logger) {
+							$logger->warn("$addr: blocked connexion attempt for /etc/passwd from ", $info->as_string());
+						}
+						$status{$addr} = 0;
+						$info->status(403);
+						return 0;
+					}
 				}
 			}
 		}
@@ -164,9 +172,11 @@ sub allow {
 				if($logger) {
 					$logger->warn("$addr: Blocked trawler");
 				}
+				$info->status(403);
 				$status{$addr} = 0;
 				throw Error::Simple("$addr: Blocked trawler");
 			}
+
 			# Protect against Shellshocker
 			require Data::Validate::URI;
 			Data::Validate::URI->import();
@@ -176,7 +186,19 @@ sub allow {
 					$logger->warn("$addr: Blocked shellshocker for $referer");
 				}
 				$status{$addr} = 0;
+				$info->status(403);
 				throw Error::Simple("$addr: Blocked shellshocker for $referer");
+			}
+		}
+
+		if(my $script_uri = $ENV{'SCRIPT_URI'}) {
+			if(($script_uri =~ /\/shell\.php$/) ||
+			   ($script_uri =~ /\/cmd\.php$/)) {
+				if($logger) {
+					$logger->warn("$addr: Blocked attacker from $addr");
+				}
+				$status{$addr} = 0;
+				throw Error::Simple("$addr: Blocked attacker for $addr");
 			}
 		}
 	}
