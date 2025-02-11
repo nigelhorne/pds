@@ -16,6 +16,12 @@ use strict;
 use warnings;
 # use diagnostics;
 
+BEGIN {
+	# Sanitize environment variables
+	delete @ENV{qw(IFS CDPATH ENV BASH_ENV)};
+	$ENV{'PATH'} = '/usr/local/bin:/bin:/usr/bin';	# For insecurity
+}
+
 no lib '.';
 
 use Log::Log4perl qw(:levels);	# Put first to cleanup last
@@ -35,6 +41,10 @@ use Log::WarnDie 0.09;
 use CGI::ACL;
 use HTTP::Date;
 use POSIX qw(strftime);
+use Readonly;
+use Time::HiRes;
+
+# FIXME: Sometimes gives Insecure dependency in require while running with -T switch in Module/Runtime.pm
 # use Taint::Runtime qw($TAINT taint_env);
 use autodie qw(:all);
 
@@ -111,10 +121,19 @@ my $photographs = PDS::DB::photographs->new();
 my $requestcount = 0;
 my $handling_request = 0;
 my $exit_requested = 0;
+my %blacklisted_ip;
 
 # CHI->stats->enable();
 
-my $acl = CGI::ACL->new()->deny_country(country => ['RU', 'CN'])->allow_ip('131.161.0.0/16')->allow_ip('127.0.0.1');
+my $rate_limit_cache;	# Rate limit clients by IP address
+Readonly my @rate_limit_trusted_ips => ('127.0.0.1', '192.168.1.1');
+
+Readonly my @blacklist_country_list => (
+	'BY', 'MD', 'RU', 'CN', 'BR', 'UY', 'TR', 'MA', 'VE', 'SA', 'CY',
+	'CO', 'MX', 'IN', 'RS', 'PK', 'UA', 'XH'
+);
+
+my $acl = CGI::ACL->new()->deny_country(country => \@blacklist_country_list)->allow_ip('108.44.193.70')->allow_ip('127.0.0.1');
 
 sub sig_handler {
 	$exit_requested = 1;
@@ -258,6 +277,14 @@ sub doit
 	if(my $w = $info->warnings()) {
 		my @warnings = map { $_->{'warning'} } @{$w};
 		$warnings = join(';', @warnings);
+	}
+
+	if(!-r $vwflog) {
+		# First run - put in the heading row
+		open(my $log, '>', $vwflog);
+		print $log '"domain_name","time","IP","country","type","language","http_code","template","args","warnings","error"',
+			"\n";
+		close $log;
 	}
 
 	# Access control checks
@@ -503,6 +530,27 @@ sub choose
 			"/cgi-bin/page.fcgi?page=upload\n",
 			"/cgi-bin/page.fcgi?page=meta_data\n";
 	}
+}
+
+# Is this client trying to attack us?
+sub blacklist
+{
+	if(my $remote = $ENV{'REMOTE_ADDR'}) {
+		if($blacklisted_ip{$remote}) {
+			$info->status(301);
+			return 1;
+		}
+
+		my $info = shift;
+		if(my $string = $info->as_string()) {
+			if(($string =~ /SELECT.+AND.+/) || ($string =~ /ORDER BY /) || ($string =~ / OR NOT /) || ($string =~ / AND \d+=\d+/) || ($string =~ /THEN.+ELSE.+END/) || ($string =~ /.+AND.+SELECT.+/) || ($string =~ /\sAND\s.+\sAND\s/) || ($string =~ /AND\sCASE\sWHEN/)) {
+				$blacklisted_ip{$remote} = 1;
+				$info->status(301);
+				return 1;
+			}
+		}
+	}
+	return 0;
 }
 
 # False positives we don't need in the logs
