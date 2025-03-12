@@ -165,11 +165,11 @@ sub new {
 	}
 
 	if(my $twitter = $config->{'twitter'}) {
-		$smcache ||= ::create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
+		$smcache ||= create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
 		$sm ||= HTML::SocialMedia->new({ twitter => $twitter, cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
 		$self->{'_social_media'}->{'twitter_tweet_button'} = $sm->as_string(twitter_tweet_button => 1);
 	} elsif(!defined($sm)) {
-		$smcache = ::create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
+		$smcache = create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
 		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
 	}
 	$self->{'_social_media'}->{'facebook_share_button'} = $sm->as_string(facebook_share_button => 1);
@@ -350,6 +350,15 @@ sub get_template_path
 	return $filename;
 }
 
+=head2 set_cookie
+
+Sets cookie values in the object.
+Takes either a hash reference or a list of key-value pairs as input.
+Iterates over the CGI parameters and stores them in the object's _cookies hash.
+Returns the object itself, allowing for method chaining.
+
+=cut
+
 sub set_cookie
 {
 	my $self = shift;
@@ -361,9 +370,16 @@ sub set_cookie
 	return $self;
 }
 
+=head2 http
+
+Returns the HTTP header section, terminated by an empty line
+
+=cut
+
 sub http
 {
 	my $self = shift;
+	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
 	# Handle session cookies
 	# TODO: Only session cookies as the moment
@@ -378,14 +394,19 @@ sub http
 	# TODO: Change the headers, e.g. character set, based on the language
 	# my $language = $self->{_lingua} ? $self->{_lingua}->language() : 'English';
 
-	# Determine content type
-	my $filename = $self->get_template_path();
 	my $rc;
-	if ($filename =~ /\.txt$/) {
-		$rc = "Content-Type: text/plain\n";
+	if($params{'Content-Type'}) {
+		# Allow the content type to be forceably set
+		$rc = $params{'Content-Type'} . "\n";
 	} else {
-		binmode(STDOUT, ':utf8');
-		$rc = "Content-Type: text/html; charset=UTF-8\n";
+		# Determine content type
+		my $filename = $self->get_template_path();
+		if ($filename =~ /\.txt$/) {
+			$rc = "Content-Type: text/plain\n";
+		} else {
+			binmode(STDOUT, ':utf8');
+			$rc = "Content-Type: text/html; charset=UTF-8\n";
+		}
 	}
 
 	# Security headers
