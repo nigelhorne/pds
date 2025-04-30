@@ -4,6 +4,7 @@ use strict;
 use warnings;
 
 use PDS::Display;
+use Data::Reuse;
 use File::Basename;
 use File::Spec;
 
@@ -19,6 +20,7 @@ sub http {
 		'section' => qr/^S\d+$/,	# Takes a section as a parameter
 		'entry' => qr/^A\d+$/,	# Takes an album as a parameter
 		'lang' => qr/^[A-Z][A-Z]/i,
+		'lint_content' => qr/^\d$/,
 	};
 	my %params = %{$info->params({ allow => $allowed })};
 
@@ -70,6 +72,7 @@ sub html {
 	my $pics = $photographs->selectall_hashref(\%params);
 	my $root_dir = $self->{_config}->{root_dir} || $self->{_info}->root_dir();
 
+	# This loop is why the photograph table can't be fixated
 	foreach my $pic(@{$pics}) {
 		my $thumbnail = File::Spec->catfile($root_dir, 'thumbs', $pic->{'entry'}, $pic->{'section'}, $pic->{'file'});
 		$thumbnail =~ s/\.jpe?g$/.png/i;
@@ -99,6 +102,9 @@ sub html {
 		$thumbnail =~ s/\.jpe?g$/.png/i;
 		$pic->{'thumbnail'} = $thumbnail;
 	}
+
+	# Now the values can be fixated
+	Data::Reuse::fixate(@{$pics});
 
 	return $self->SUPER::html({
 		photographs => $pics,

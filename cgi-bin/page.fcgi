@@ -126,7 +126,7 @@ if($@) {
 	die $@;
 }
 my $sections = PDS::DB::sections->new();
-my $photographs = PDS::DB::photographs->new();
+my $photographs = PDS::DB::photographs->new(no_fixate => 1);
 
 # FIXME - support $config->vwflog();
 my $vwf_log = PDS::DB::vwf_log->new({ directory => $info->logdir(), filename => 'vwf.log', no_entry => 1 });
@@ -536,7 +536,7 @@ sub doit
 			$info->status(403);
 			$log->status(403);
 		}
-		vwflog($vwflog, $info, $lingua, $syslog, 'Access denied', $log);
+		vwflog($vwflog, $info, $lingua, $syslog, $error ? $error : 'Access denied', $log);
 		throw Error::Simple($error ? $error : $info->as_string());
 	}
 }
