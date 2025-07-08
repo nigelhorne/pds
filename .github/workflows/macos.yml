@@ -1,5 +1,7 @@
 ---
 name: macos
+permissions:
+  contents: read
 
 on:
   push:
