@@ -1,8 +1,16 @@
-# root_dir: /home/you/imgsite.com
-SiteTitle: Test Picture Site
-# memory_cache: driver=File, root_dir=/tmp/cache
-memory_cache: driver=Null
-# disc_cache: driver=File, root_dir=/tmp/cache
-disc_cache: driver=DBI, connect=dbi:SQLite:dbname=/tmp/cache/pds.sqlite
-twitter: yourtwitterhandle
-contact: name=Your Name Goes Here, email=you@example.com
+<?xml version="1.0"?>
+<config>
+	<memory_cache>
+		<driver>Null</driver>
+	</memory_cache>
+	<disc_cache>
+		<driver>Null</driver>
+	</disc_cache>
+	<SiteTitle>Test Picture Site</SiteTitle>
+	<root_dir>/Users/njh/src/njh/pds</root_dir>
+	<twitter>YourTwitterHandle</twitter>
+	<contact>
+		<name>Your Name</name>
+		<email>you@example.com</email>
+	</contact>
+</config>
