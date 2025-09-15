@@ -17,7 +17,7 @@ use PDS::DB::sections;
 use PDS::DB::photographs;
 
 Database::Abstraction::init({
-	directory => File::Spec->rel2abs('../databases')
+	directory => File::Spec->rel2abs('../data')
 });
 
 my $albums = PDS::DB::albums->new();
