@@ -22,12 +22,14 @@ use CGI::Info;
 use Data::Dumper;
 use Digest::SHA qw(sha256_hex);
 use File::Spec;
+use Object::Configure;
+use Params::Get;
 use Template::Filters;
 use Template::Plugin::EnvHash;
 use Template::Plugin::Math;
 use Template::Plugin::JSON;
 use HTML::SocialMedia;
-use PDS::Utils qw(create_memory_cache create_disc_cache);
+use PDS::Utils qw(create_memory_cache);
 use Error;
 use Fatal qw(:void open);
 use File::pfopen;
@@ -63,7 +65,7 @@ sub new
 	my $class = shift;
 
 	# Handle hash or hashref arguments
-	my %args = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
+	my $params = Params::Get::get_params(undef, @_);
 
 	if(!defined($class)) {
 		# Using PDS::Display->new(), not PDS::Display::new()
@@ -74,7 +76,7 @@ sub new
 		$class = __PACKAGE__;
 	} elsif(Scalar::Util::blessed($class)) {
 		# If $class is an object, clone it with new arguments
-		return bless { %{$class}, %args }, ref($class);
+		return bless { %{$class}, %{$params} }, ref($class);
 	}
 
 	if(defined($ENV{'HTTP_REFERER'})) {
@@ -87,17 +89,19 @@ sub new
 		}
 	}
 
-	my $info = $args{info} || CGI::Info->new();
+	$params = Object::Configure::configure($class, $params);
+
+	my $info = $params->{info} || CGI::Info->new();
 
 	# Configuration loading
-	my $config_dir = _find_config_dir(\%args, $info);
-	if($args{'logger'}) {
-		$args{'logger'}->debug(__PACKAGE__, ' (', __LINE__, "): path = $config_dir");
+	my $config_dir = _find_config_dir($params, $info);
+	if($params->{'logger'}) {
+		$params->{'logger'}->debug(__PACKAGE__, ' (', __LINE__, "): path = $config_dir");
 	}
 	my $config;
 	eval {
 		# Try default first, then domain-specific config first
-		if($config = Config::Abstraction->new(config_dirs => [$config_dir], config_files => ['default', $info->domain_name()], logger => $args{'logger'})) {
+		if($config = Config::Abstraction->new(config_dirs => [$config_dir], config_files => ['default', $info->domain_name()], logger => $params->{'logger'})) {
 			$config = $config->all();
 		}
 	};
@@ -106,9 +110,9 @@ sub new
 	}
 
 	# The values in config are defaults which can be overridden by
-	# the values in args{config}
-	if(defined($args{'config'})) {
-		$config = { %{$config}, %{$args{'config'}} };
+	# the values in params->{config}
+	if(defined($params->{'config'})) {
+		$config = { %{$config}, %{$params->{'config'}} };
 	}
 
 	unless($info->is_search_engine() || !defined($ENV{'REMOTE_ADDR'})) {
@@ -129,12 +133,10 @@ sub new
 
 		# Connection throttling system
 		require Data::Throttler;
-		Data::Throttler->import();
 
-		# Handle YAML Errors
 		my $db_file = $config->{'throttle'}->{'file'} // File::Spec->catdir($info->tmpdir(), 'throttle');
-		eval {
-			my $throttler = Data::Throttler->new(
+		eval {	# Handle YAML Errors
+			my %options = (
 				max_items => $config->{'throttle'}->{'max_items'} // 30,	# Allow 30 requests
 				interval => $config->{'throttle'}->{'interval'} // 90,	# Per 90 second window
 				backend => 'YAML',
@@ -143,22 +145,27 @@ sub new
 				}
 			);
 
-			# Block if over the limit
-			unless($throttler->try_push(key => $ENV{'REMOTE_ADDR'})) {
-				$info->status(429);	# Too many requests
-				sleep(1);	# Slow down attackers
-				if($args{'logger'}) {
-					$args{'logger'}->warn("$ENV{REMOTE_ADDR} connexion throttled");
+			if(my $throttler = Data::Throttler->new(%options)) {
+				# Block if over the limit
+				if(!$throttler->try_push(key => $ENV{'REMOTE_ADDR'})) {
+					$info->status(429);	# Too many requests
+					sleep(1);	# Slow down attackers
+					if($params->{'logger'}) {
+						$params->{'logger'}->warn("$ENV{REMOTE_ADDR} connexion throttled");
+					}
+					return;
 				}
-				return;
 			}
 		};
 		if($@) {
+			if($params->{'logger'}) {
+				$params->{'logger'}->warn("Removing unparsable YAML file $db_file");
+			}
 			unlink($db_file);
 		}
 
 		# Country based blocking
-		if(my $lingua = $args{lingua}) {
+		if(my $lingua = $params->{lingua}) {
 			if($blacklist{uc($lingua->country())}) {
 				die "$ENV{REMOTE_ADDR} is from a blacklisted country ", $lingua->country();
 			}
@@ -170,16 +177,16 @@ sub new
 
 	# _ names included for legacy reasons, they will go away
 	my $self = {
-		_cachedir => $args{cachedir},
+		_cachedir => $params->{cachedir},
 		config => $config,
 		_config => $config,
 		info => $info,
 		_info => $info,
-		_logger => $args{logger},
-		%args,
+		_logger => $params->{logger},
+		%{$params},
 	};
 
-	if(my $lingua = $args{'lingua'}) {
+	if(my $lingua = $params->{'lingua'}) {
 		$self->{'lingua'} = $lingua;
 		$self->{'_lingua'} = $lingua;
 	}
@@ -194,12 +201,12 @@ sub new
 
 	# Social media integration
 	if(my $twitter = $config->{'twitter'}) {
-		$smcache ||= create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
-		$sm ||= HTML::SocialMedia->new({ twitter => $twitter, cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
+		$smcache ||= create_memory_cache(config => $config, logger => $params->{'logger'}, namespace => 'HTML::SocialMedia');
+		$sm ||= HTML::SocialMedia->new({ twitter => $twitter, cache => $smcache, lingua => $params->{lingua}, logger => $params->{logger} });
 		$self->{'_social_media'}->{'twitter_tweet_button'} = $sm->as_string(twitter_tweet_button => 1);
 	} elsif(!defined($sm)) {
-		$smcache = create_memory_cache(config => $config, logger => $args{'logger'}, namespace => 'HTML::SocialMedia');
-		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $args{lingua}, logger => $args{logger} });
+		$smcache = create_memory_cache(config => $config, logger => $params->{'logger'}, namespace => 'HTML::SocialMedia');
+		$sm = HTML::SocialMedia->new({ cache => $smcache, lingua => $params->{lingua}, logger => $params->{logger} });
 	}
 	$self->{'_social_media'}->{'facebook_share_button'} = $sm->as_string(facebook_share_button => 1);
 	# $self->{'_social_media'}->{'google_plusone'} = $sm->as_string(google_plusone => 1);
@@ -311,7 +318,7 @@ sub as_string {
 	# return $self->http() . $html;
 
 	# Build the HTTP response
-	my $rc = $self->http();
+	my $rc = $self->http($args);
 	return $rc =~ /^Location:\s/ms ? $rc : $rc . $self->html($args);
 }
 
@@ -448,7 +455,7 @@ sub http
 	}
 
 	# Generate CSRF token for forms
-	if($self->{config}->{security}->{enable_csrf} // 1) {
+	if($self->{config}->{security}->{csrf}->{enable} // 1) {
 		my $csrf_token = $self->_generate_csrf_token();
 		print "Set-Cookie: csrf_token=$csrf_token; path=/; HttpOnly; SameSite=Strict\n";
 	}
@@ -470,6 +477,10 @@ sub http
 			binmode(STDOUT, ':utf8');
 			$rc = "Content-Type: text/html; charset=UTF-8\n";
 		}
+	}
+
+	if($params->{'Retry-After'}) {
+		$rc = $params->{'Retry-After'} . "\n";
 	}
 
 	# Security headers
@@ -613,7 +624,7 @@ sub _types
 sub _generate_csrf_token($self) {
 	my $timestamp = time();
 	my $random = sprintf('%08x', int(rand(0xFFFFFFFF)));
-	my $secret = $self->{config}->{security}->{csrf_secret} // 'default_secret';
+	my $secret = $self->{config}->{security}->{csrf}->{secret} // 'default_secret';
 
 	my $token_data = "$timestamp:$random";
 	my $signature = sha256_hex("$token_data:$secret");

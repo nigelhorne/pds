@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<config>
+	<memory_cache>
+		<driver>Null</driver>
+	</memory_cache>
+	<disc_cache>
+		<driver>Null</driver>
+	</disc_cache>
+	<SiteTitle>
+		<English>Test Picture Site</English>
+		<Default>Test Picture Site</Default>
+	</SiteTitle>
+	<root_dir>/Users/njh/src/njh/pds</root_dir>
+	<twitter>YourTwitterHandle</twitter>
+	<contact>
+		<name>Your Name</name>
+		<email>you@example.com</email>
+	</contact>
+
+	<!--
+		Get keys from https://www.google.com/recaptcha/admin
+	-->
+	<recaptcha>
+		<site_key>YOUR_SITE_KEY_HERE</site_key>
+		<secret_key>YOUR_SECRET_KEY_HERE</secret_key>
+		<enabled>1</enabled>
+	</recaptcha>
+
+	<security>
+		<rate_limiting>
+			<!--  Hard limit - block completely -->
+			<max_requests_hard>150</max_requests_hard>
+			<!-- Soft limit - show CAPTCHA -->
+			<max_requests>100</max_requests>
+			<time_window>60s</time_window>
+			<!-- 5 minutes after successful CAPTCHA -->
+			<captcha_bypass_duration>300s</captcha_bypass_duration>
+		</rate_limiting>
+		<!-- CGI::IDS threshold -->
+		<ids_threshold>50</ids_threshold>
+		<csrf>
+			<!-- Generate CSRF token for forms -->
+			<enable>1</enable>
+			<secret>default_secret</secret>
+		</csrf>
+	</security>
+</config>

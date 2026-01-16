@@ -2,20 +2,20 @@
     "http://www.w3.org/TR/html4/loose.dtd">
 <html lang="en" dir="ltr">
 	<head>
-		<title>[% SiteTitle.join(' ') %]</title>
+		<title>[% SiteTitle.Default.join(' ') %]</title>
 		<meta http-equiv="Content-Language" content="English">
 		<link rel="stylesheet" href="/css/mobile.css" type="text/css" media="screen">
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta charset="utf8">
 		[% IF twitter %]
 			<meta name="twitter:site" content="@[% twitter %]">
-			<meta name="twitter:title" content="@[% SiteTitle %]">
+			<meta name="twitter:title" content="@[% SiteTitle.Default %]">
 		[% END %]
-		<meta name="description" content="[% SiteTitle.join(' ') %] - A PDS webpage">
+		<meta name="description" content="[% SiteTitle.Default.join(' ') %] - A PDS webpage">
 		<meta name="Copyright" content="Copyright (C) 2020 Nigel Horne">
 	</head>
 	<body>
-		<h1>[% SiteTitle.join(' ') %]</h1>
+		<h1>[% SiteTitle.Default.join(' ') %]</h1>
 		[% IF error %]
 			<p><font color="red" size="+2">[% error %]</font></p>
 		[% END %]

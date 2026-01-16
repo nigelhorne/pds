@@ -204,6 +204,12 @@ sub _validate_cache_config($config, $cache_type) {
 		croak('Port must be between 1 and 65535')
 			unless $port >= 1 && $port <= 65535;
 	}
+
+	# Validate memory parameters
+	if(exists($cache_config->{'datastore'}) && exists($cache_config->{'global'}) && (my $driver = $cache_config->{'driver'})) {
+		# CHI catches this as well, but putting it here helps to track the error
+		croak('Memory cache cannot have both global and datastore');
+	}
 }
 
 sub _get_default_driver($cache_type, $logger) {
@@ -316,9 +322,11 @@ sub _configure_shared_memory($chi_args, $config, $args) {
 	$chi_args->{max_size} = $args->{'max_size'} || $config->{max_size} || 1024;
 }
 
-sub _configure_memory($chi_args, $config) {
-	$chi_args->{'global'} = $config->{'global'} // 1;
-	if(!$chi_args->{'global'}) {
+sub _configure_memory($chi_args, $config)
+{
+	if(exists $config->{'global'}) {
+		$chi_args->{'global'} = $config->{'global'};
+	} else {
 		$chi_args->{'datastore'} = {};
 	}
 }

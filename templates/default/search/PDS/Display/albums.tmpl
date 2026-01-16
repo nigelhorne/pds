@@ -12,15 +12,15 @@
 		<meta name="Author" content="Nigel Horne">
 		[% IF twitter %]
 			<meta name="twitter:site" content="@[% twitter %]">
-			<meta name="twitter:title" content="@[% SiteTitle %]">
+			<meta name="twitter:title" content="@[% SiteTitle.Default %]">
 		[% END %]
-		<title>[% SiteTitle %]</title>
+		<title>[% SiteTitle.Default %]</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 	</head>
 	<body>
-		<h1>[% SiteTitle %]</h1>
+		<h1>[% SiteTitle.Default %]</h1>
 		<p>
-			Browse and view pictures in [% SiteTitle %]
+			Browse and view pictures in [% SiteTitle.Default %]
 			<ol>
 				[% FOREACH album IN albums %]
 					<li><a href="?page=sections&entry=[% album.entry %]">[% album.title %]</a></li>

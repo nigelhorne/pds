@@ -13,9 +13,9 @@
 		<meta charset="utf-8">
 		[% IF twitter %]
 			<meta name="twitter:site" content="@[% twitter %]">
-			<meta name="twitter:title" content="@[% SiteTitle %]">
+			<meta name="twitter:title" content="@[% SiteTitle.Default %]">
 		[% END %]
-		<meta name="description" content="[% SiteTitle.join(' ') %] - A PDS webpage">
+		<meta name="description" content="[% SiteTitle.Default.join(' ') %] - A PDS webpage">
 		<meta name="Copyright" content="Copyright (C) 2021 Nigel Horne">
 	</head>
 	<body>

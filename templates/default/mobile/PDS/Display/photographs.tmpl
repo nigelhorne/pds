@@ -7,7 +7,7 @@
 		<meta http-equiv="Content-Language" content="English">
 		[% IF twitter %]
 			<meta name="twitter:site" content="@[% twitter %]">
-			<meta name="twitter:title" content="@[% SiteTitle %]">
+			<meta name="twitter:title" content="@[% SiteTitle.Default %]">
 		[% END %]
 		[% IF section %]
 			<title>[% section.title %]</title>
@@ -18,7 +18,7 @@
 		[% END %]
 		[% IF twitter %]
 			<meta name="twitter:site" content="@[% twitter %]">
-			<meta name="twitter:title" content="@[% SiteTitle %]">
+			<meta name="twitter:title" content="@[% SiteTitle.Default %]">
 		[% END %]
 		<link rel="stylesheet" href="/css/mobile.css" type="text/css" media="screen">
 		<link rel="stylesheet" href="/css/magnific-popup.css" type="text/css" media="screen">
