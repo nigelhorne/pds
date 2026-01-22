@@ -781,9 +781,8 @@ sub vwflog
 	}
 
 	if($syslog) {
-		require Sys::Syslog;
+		require 'Sys::Syslog' && Sys::Syslog->import() unless Sys::Syslog->can('openlog');
 
-		Sys::Syslog->import();
 		if(ref($syslog) eq 'HASH') {
 			Sys::Syslog::setlogsock($syslog);
 		}
