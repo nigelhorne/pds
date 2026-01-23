@@ -331,8 +331,7 @@ sub doit
 
 	# Check if this is a CAPTCHA verification attempt
 	if ($info->param('g-recaptcha-response')) {
-		require 'VWF::CAPTCHA';
-		VWF::CAPTCHA->new();
+		require 'VWF::CAPTCHA' && VWF::CAPTCHA->import() unless VWF::CAPTCHA->can('new');
 
 		my $recaptcha_config = $config->recaptcha();
 		if ($recaptcha_config && $recaptcha_config->{enabled}) {
@@ -393,7 +392,7 @@ sub doit
 				$logger->warn("Hard rate limit exceeded for $client_ip ($request_count requests)");
 				$info->status(429);
 
-				eval 'require VWF::Display::captcha';
+				require 'VWF::Display::captcha' && VWF::Display::captcha->import() unless VWF::Display::captcha->can('new');
 				my $display = VWF::Display::captcha->new({
 					cachedir => $cachedir,
 					info => $info,
@@ -542,7 +541,7 @@ sub doit
 
 			# TODO: consider creating a whitelist of valid modules
 			$logger->debug("doit(): Loading module $display_module from @INC");
-			eval "require $display_module";
+			eval "require $display_module; 1" && $display_module->import() unless $display_module->can('new');
 			if($@) {
 				$logger->debug("Failed to load module $display_module: $@");
 				$logger->info("Unknown page $page");
@@ -551,7 +550,6 @@ sub doit
 					$info->status(404);
 				}
 			} else {
-				$display_module->import();
 				# use Class::Inspector;
 				# my $methods = Class::Inspector->methods($display_module);
 				# print "$display_module exports ", join(', ', @{$methods}), "\n";
