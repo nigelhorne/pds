@@ -45,7 +45,7 @@ use Error qw(:try);
 use File::Spec;
 use POSIX qw(strftime);
 use Readonly;
-use Time::HiRes;
+use Timer::Simple;
 
 # FIXME: Sometimes gives Insecure dependency in require while running with -T switch in Module/Runtime.pm
 # use Taint::Runtime qw($TAINT taint_env);
@@ -193,6 +193,8 @@ my $request = FCGI::Request();
 while($handling_request = ($request->Accept() >= 0)) {
 	unless($ENV{'REMOTE_ADDR'}) {
 		# debugging from the command line
+		my $timer = Timer::Simple->new();
+
 		$ENV{'NO_CACHE'} = 1;
 		if((!defined($ENV{'HTTP_ACCEPT_LANGUAGE'})) && defined($ENV{'LANG'})) {
 			my $lang = $ENV{'LANG'};
@@ -200,6 +202,7 @@ while($handling_request = ($request->Accept() >= 0)) {
 			$lang =~ tr/_/-/;
 			$ENV{'HTTP_ACCEPT_LANGUAGE'} = lc($lang);
 		}
+
 		Database::Abstraction::init({ logger => $logger });
 
 		$logger = Log::Abstraction->new(logger => sub { print join(', ', @{$_[0]->{'message'}}), "\n" }, level => 'debug');
@@ -218,6 +221,11 @@ while($handling_request = ($request->Accept() >= 0)) {
 			warn "$msg\n", $msg->stacktrace();
 			$logger->error($msg);
 		};
+
+		my @elapsed_time = $timer->hms();
+		my $timetaken = int($elapsed_time[2] * 1000);
+		$logger->info("$script_name completed in ${timetaken}ms");
+
 		last;
 	}
 
@@ -227,14 +235,9 @@ while($handling_request = ($request->Accept() >= 0)) {
 	$albums->set_logger($logger);
 	$vwf_log->set_logger($logger);
 
-	my $start = [Time::HiRes::gettimeofday()];
-
 	# TODO:  Make this neater
 	try {
 		doit(debug => 0);
-		my $timetaken = Time::HiRes::tv_interval($start);
-
-		$logger->info("$script_name completed in $timetaken seconds");
 	} catch Error with {
 		my $msg = shift;
 		$logger->error("$msg: ", $msg->stacktrace());
@@ -279,7 +282,7 @@ exit(0);
 # Create and send response to the client for each request
 sub doit
 {
-	my $request_start = Time::HiRes::time();
+	my $request_start = Timer::Simple->new();
 
 	CGI::Info->reset();
 
