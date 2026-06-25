@@ -738,7 +738,7 @@ sub vwflog
 
 	my $duration_ms = '';
 	if($request_start) {
-		$duration_ms = int( (Time::HiRes::time() - $request_start) * 1000 );
+		$duration_ms = int((Time::HiRes::time() - $request_start) * 1000);
 	}
 
 	my $template;
@@ -766,14 +766,16 @@ sub vwflog
         }
 	$warnings ||= '';
 
+	my $country = $lingua->country() || 'unknown';
+
 	if(open(my $fout, '>>', $vwflog)) {
 		print $fout
 			'"', $info->domain_name(), '",',
 			'"', strftime('%F %T', localtime), '",',
 			'"', ($ENV{REMOTE_ADDR} ? $ENV{REMOTE_ADDR} : ''), '",',
-			'"', $lingua->country(), '",',
+			'"', $country, '",',
 			'"', $info->browser_type(), '",',
-			'"', $lingua->language(), '",',
+			'"', ($lingua->language() || ''), '",',
 			$info->status(), ',',
 			'"', $template, '",',
 			'"', $info->as_string(raw => 1), '",',
@@ -797,7 +799,7 @@ sub vwflog
 		Sys::Syslog::syslog('info|local0', '%s %s %s %s %s %d %s %s %d %s %s',
 			$info->domain_name() || '',
 			$ENV{REMOTE_ADDR} || '',
-			$lingua->country() || '',
+			$country,
 			$info->browser_type() || '',
 			$lingua->language() || '',
 			$info->status() || '',
