@@ -334,7 +334,10 @@ sub doit
 
 	# Check if this is a CAPTCHA verification attempt
 	if ($info->param('g-recaptcha-response')) {
-		require 'VWF::CAPTCHA' && VWF::CAPTCHA->import() unless VWF::CAPTCHA->can('new');
+		unless(VWF::CAPTCHA->can('new')) {
+			require VWF::CAPTCHA;
+			VWF::CAPTCHA->import();
+		}
 
 		my $recaptcha_config = $config->recaptcha();
 		if ($recaptcha_config && $recaptcha_config->{enabled}) {
