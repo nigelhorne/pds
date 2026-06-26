@@ -26,7 +26,7 @@ no lib '.';
 
 use Log::WarnDie 0.09;
 use Carp::Always;
-use CGI::ACL;
+use CGI::ACL 0.06;	# For deny_cloud
 use CGI::Carp qw(fatalsToBrowser);
 use CGI::Info 0.94;	# Gets all messages
 use CGI::Lingua 0.61;
@@ -544,7 +544,10 @@ sub doit
 
 			# TODO: consider creating a whitelist of valid modules
 			$logger->debug("doit(): Loading module $display_module from @INC");
-			eval "require $display_module; 1" && $display_module->import() unless $display_module->can('new');
+			unless($display_module->can('new')) {
+				eval "require $display_module; 1";
+				$display_module->import();
+			}
 			if($@) {
 				$logger->debug("Failed to load module $display_module: $@");
 				$logger->info("Unknown page $page");
