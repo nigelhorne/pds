@@ -295,9 +295,11 @@ sub doit
 	#	config file to read
 	$config ||= PDS::Config->new({
 		logger => $logger,
+		info => $info,
 		debug => $params{'debug'},
 		lingua => CGI::Lingua->new({ supported => [ 'en-gb' ], info => $info, logger => $logger })	# Use a temporary CGI::Lingua
 	});
+
 	# Stores things for a day or longer
 	$info_cache ||= create_disc_cache(config => $config, logger => $logger, namespace => 'CGI::Info');
 
