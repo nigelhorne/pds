@@ -400,7 +400,10 @@ sub doit
 				$logger->warn("Hard rate limit exceeded for $client_ip ($request_count requests)");
 				$info->status(429);
 
-				require 'VWF::Display::captcha' && VWF::Display::captcha->import() unless VWF::Display::captcha->can('new');
+				unless(VWF::Display::captcha->can('new')) {
+					require VWF::Display::captcha;
+					VWF::Display::captcha->import();
+				}
 				my $display = VWF::Display::captcha->new({
 					cachedir => $cachedir,
 					info => $info,
