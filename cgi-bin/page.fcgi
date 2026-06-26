@@ -9,7 +9,7 @@
 #	LANG=en_GB root_dir=$(pwd)/.. ./page.fcgi page=index
 # To mimic a French mobile site:
 #	root_dir=$(pwd)/.. ./page.fcgi --mobile page=index lang=fr
-# To turn off the linting of HTML on a search engine landing page
+# To turn off the linting of HTML on a search-engine landing page
 #	LANG=en_GB root_dir=$(pwd)/.. ./page.fcgi --search-engine page=index lint_content=0
 
 use strict;
@@ -597,6 +597,7 @@ sub doit
 			config => $config,
 			databasedir => $database_dir,
 			database_dir => $database_dir,
+			index => $index,
 			albums => $albums,
 			sections => $sections,
 			photographs => $photographs,
