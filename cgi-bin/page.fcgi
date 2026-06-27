@@ -605,7 +605,6 @@ sub doit
 			config => $config,
 			databasedir => $database_dir,
 			database_dir => $database_dir,
-			index => $index,
 			albums => $albums,
 			sections => $sections,
 			photographs => $photographs,
