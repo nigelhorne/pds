@@ -6,21 +6,20 @@ permissions:
 on:
   push:
     branches:
-      - '*'
+      - "*"
     tags-ignore:
-      - '*'
+      - "*"
   pull_request:
 
 jobs:
   perl:
-
     runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v7
       - uses: shogo82148/actions-setup-perl@v1.43.1
         with:
-          perl-version: '5.30'
+          perl-version: "5.30"
           distribution: strawberry
       - name: Install Dependencies
         run: |

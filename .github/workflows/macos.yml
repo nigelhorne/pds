@@ -6,14 +6,13 @@ permissions:
 on:
   push:
     branches:
-      - '*'
+      - "*"
     tags-ignore:
-      - '*'
+      - "*"
   pull_request:
 
 jobs:
   perl:
-
     runs-on: macOS-latest
 
     steps:

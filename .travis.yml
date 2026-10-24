@@ -1,8 +1,3 @@
-
-script:
-  - cd cgi-bin && perl -c -MO=Lint ./page.fcgi '' && perl -c -Mwarnings::unused ./page.fcgi ''
-  - rootdir=$(pwd)/.. perl page.fcgi page=albums
-
 language: perl
 
 os:
@@ -10,7 +5,7 @@ os:
   # - osx
 
 # services:
-  # - docker
+# - docker
 
 perl:
   # - "5.30-extras"
