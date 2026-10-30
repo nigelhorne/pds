@@ -291,11 +291,11 @@ sub doit
 
 	my %params = (ref($_[0]) eq 'HASH') ? %{$_[0]} : @_;
 
-	# Don't pass $info in since it was created before the connection, so it doesn't know the domain name
-	#	config file to read
+	# $config is built once per process and reused.  We cannot build it before
+	# the first Accept() because the domain name is not known until then.
+	# So don't pass $info in since it was created before the connection
 	$config ||= PDS::Config->new({
 		logger => $logger,
-		info => $info,
 		debug => $params{'debug'},
 		lingua => CGI::Lingua->new({ supported => [ 'en-gb' ], info => $info, logger => $logger })	# Use a temporary CGI::Lingua
 	});
