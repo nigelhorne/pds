@@ -325,6 +325,7 @@ sub as_string {
 		$cache = create_memory_cache(config => $self->{config}, logger => $self->{'logger'}, namespace => ref($self));
 		$key = cache_key_from_hashref($args);
 		if(my $rc = $cache->get($key)) {
+			$self->_send_csrf_token($rc);
 			return $rc;
 		}
 	}
@@ -341,6 +342,7 @@ sub as_string {
 		return $rc;
 	}
 	$rc .= $self->html($args);
+	$self->_send_csrf_token($rc);
 	if($cache) {
 		$self->{cache_duration} ||= '5 minutes';
 		$cache->set($key, $rc, $self->{cache_duration});
@@ -483,12 +485,6 @@ sub http
 			my $secure = ($self->{'info'}->protocol() eq 'https') ? '; Secure' : '';
 			print "Set-Cookie: $cookie=$value; path=/; HttpOnly; SameSite=Strict$secure\n";
 		}
-	}
-
-	# Generate CSRF token for forms
-	if($self->{config}->{security}->{csrf}->{enable} // 1) {
-		my $csrf_token = $self->_generate_csrf_token();
-		print "Set-Cookie: csrf_token=$csrf_token; path=/; HttpOnly; SameSite=Strict\n";
 	}
 
 	# Determine language, defaulting to English
@@ -650,6 +646,19 @@ sub _types
 	}
 
 	return @rc;
+}
+
+# Issue a fresh CSRF token to a page that has a form, so that the form can embed it.
+# The token is validated server-side when the form is submitted.
+# CSRF protection is enabled by default and can be turned off in config.
+# Other pages aren't sent one: FCGI::Buffer won't cache or save a page that has a
+# Set-Cookie header, since it would give that cookie to everyone.
+sub _send_csrf_token($self, $page) {
+	return unless($page =~ /<form\b/i);
+	return unless($self->{config}->{security}->{csrf}->{enable} // 1);
+
+	my $csrf_token = $self->_generate_csrf_token();
+	print "Set-Cookie: csrf_token=$csrf_token; path=/; HttpOnly; SameSite=Strict\n";
 }
 
 sub _generate_csrf_token($self) {
