@@ -25,6 +25,16 @@ jobs:
         with:
           perl-version: "5.30"
           distribution: strawberry
+      - name: Stub CGI::Alert
+        # Web::VWF requires CGI::Alert, whose Makefile.PL dies with
+        # "OS unsupported" on Windows, so Web::VWF can never install here.
+        # A stub satisfies the dependency check; it only has to exist.
+        shell: bash
+        run: |
+          dir="$(perl -MConfig -e 'print $Config{installsitelib}')/CGI"
+          mkdir -p "$dir"
+          printf 'package CGI::Alert;\nour $VERSION = "2.09";\n1;\n' > "$dir/Alert.pm"
+          perl -MCGI::Alert -e 'print "CGI::Alert stub OK\n"'
       - name: Install Dependencies
         run: |
           cpanm -iq File::Spec ExtUtils::MakeMaker
