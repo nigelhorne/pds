@@ -5,6 +5,14 @@
 name: linux
 permissions:
   contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
 on:
   push:
     branches:
@@ -32,7 +40,7 @@ jobs:
       - name: Install Dependencies
         run: |
           cpanm -iq File::Spec ExtUtils::MakeMaker
-          cpanm --skip-satisfied -qin autodie warnings::unused FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo DBD::CSV Text::xSV::Slurp YAML::XS CGI::ACL IPC::System::Simple Taint::Runtime Gzip::Faster Data::Serializer Database::Abstraction Class::Simple XML::Simple Template::Plugin::JSON
+          cpanm --skip-satisfied -qin autodie warnings::unused Web::VWF FCGI Log::Log4perl CGI::Carp CGI::Info CGI::Lingua FCGI::Buffer File::HomeDir Log::WarnDie Template::Plugin::EnvHash HTML::SocialMedia File::pfopen Log::Any::Adapter::Log4perl Text::CSV::Slurp B::Lint Error Config::Auto CHI Log::Dispatch::File YAML::Any Mo DBD::CSV Text::xSV::Slurp YAML::XS CGI::ACL IPC::System::Simple Taint::Runtime Gzip::Faster Data::Serializer Database::Abstraction Class::Simple XML::Simple Template::Plugin::JSON
       - name: Run Tests
         run: |
           cd cgi-bin && perl -c -MO=Lint ./page.fcgi '' && perl -c -Mwarnings::unused ./page.fcgi ''
