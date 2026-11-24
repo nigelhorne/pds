@@ -28,7 +28,10 @@ jobs:
         run: perl -V
       - name: Install Dependencies
         run: |
-          brew install openssl
+          # Net::SSLeay doesn't build against openssl@4 (removed SSLv3_method etc.)
+          brew install openssl@3
+          export OPENSSL_PREFIX="$(brew --prefix openssl@3)"
+          echo "OPENSSL_PREFIX=$OPENSSL_PREFIX" >> "$GITHUB_ENV"
           # Don't pin the perl version: brew's perl moves on (5.40 -> 5.44)
           PERL_BIN="$(brew --prefix perl)/bin"
           echo "$PERL_BIN" >> "$GITHUB_PATH"
