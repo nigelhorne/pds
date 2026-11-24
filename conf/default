@@ -1,0 +1,89 @@
+<?xml version="1.0"?>
+<config>
+	<root_dir>/home/img.example.com</root_dir>
+	<vwflog>/tmp/vwf.log</vwflog>
+	<display>
+		<!--
+			Without any <page> elements, the page modules found in <directory>
+			are the valid pages (default: ../lib/Web/VWF/Display beside cgi-bin).
+			<directory>/path/to/Display</directory>
+			A <directory> inside a <page> says where that page's module is, and
+			beats this one.
+		-->
+	</display>
+	<databases>
+		<!--
+			Where the data files (CSV, XML, SQLite) are.  Relative to cgi-bin; the
+			default, if this is left out, is ../databases.  The drivers that read them
+			are looked for here too, unless <data> says otherwise.
+		-->
+	</databases>
+	<data>
+		<!--
+			The drivers (Database::Abstraction subclasses) pages use.  Each <driver>
+			names a Web::VWF::Data:: class (a name with :: in it is used as written).
+			A <directory> here, or inside a <driver>, is where the driver's .pm file
+			is.  Without one it is the databases directory.  A driver not found in the
+			directory is taken from @INC, which is where index is found: it is
+			Web::VWF::Data::index, from the distribution.  Only a <directory> inside
+			a <driver> is strict.
+			Here the example's own driver, states.pm, is in ../data (relative to
+			cgi-bin) and its data file, states.csv, is in ../databases.
+		-->
+	</data>
+	<memory_cache>
+		<driver>Null</driver>
+	</memory_cache>
+	<disc_cache>
+		<driver>Null</driver>
+	</disc_cache>
+	<SiteTitle>
+		<English>Test Picture Site</English>
+		<Default>Test Picture Site</Default>
+	</SiteTitle>
+	<twitter>YourTwitterHandle</twitter>
+	<contact>
+		<name>Your Name</name>
+		<email>you@example.com</email>
+	</contact>
+
+	<!--
+		DKIM signing for the mail the contact page sends.  That mail goes out as
+		webmaster@<domain>, so the key must be published for the same domain:
+		openssl genrsa -out 202611.private 2048, then the public half at
+		202611._domainkey.<domain>.  Without both settings the mail is sent
+		unsigned, which is what happened before signing was supported.
+	-->
+	<!--
+	<DKIMSelector>202611</DKIMSelector>
+	<DKIMKey>/home/img.example.com/dkim/202611.private</DKIMKey>
+	-->
+
+	<!--
+		Get keys from https://www.google.com/recaptcha/admin
+	-->
+	<recaptcha>
+		<site_key>YOUR_SITE_KEY_HERE</site_key>
+		<secret_key>YOUR_SECRET_KEY_HERE</secret_key>
+		<enabled>1</enabled>
+	</recaptcha>
+
+	<security>
+		<rate_limiting>
+			<!--  Hard limit - block completely -->
+			<max_requests_hard>150</max_requests_hard>
+			<!-- Soft limit - show CAPTCHA -->
+			<max_requests>100</max_requests>
+			<time_window>60s</time_window>
+			<!-- 5 minutes after successful CAPTCHA -->
+			<captcha_bypass_duration>300s</captcha_bypass_duration>
+		</rate_limiting>
+		<!-- CGI::IDS threshold -->
+		<ids_threshold>50</ids_threshold>
+		<csrf>
+			<!-- Generate CSRF token for forms -->
+			<enable>1</enable>
+			<secret>default_secret</secret>
+		</csrf>
+	</security>
+</config>
