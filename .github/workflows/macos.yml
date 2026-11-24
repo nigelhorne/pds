@@ -29,7 +29,10 @@ jobs:
       - name: Install Dependencies
         run: |
           brew install openssl
-          export PATH=$PATH:/opt/homebrew/Cellar/perl/5.40.2/bin
+          # Don't pin the perl version: brew's perl moves on (5.40 -> 5.44)
+          PERL_BIN="$(brew --prefix perl)/bin"
+          echo "$PERL_BIN" >> "$GITHUB_PATH"
+          export PATH="$PERL_BIN:$PATH"
           cpan -iT File::Spec ExtUtils::MakeMaker App::cpanminus
           # I know -f is bad, but it's OK for this testing
           cpanm -fi -v Net::SSLeay
